@@ -8,8 +8,8 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[ExpenseDAOImpl])
 trait ExpenseDAO {
   def add(expense: Expense): Future[String]
-  def delete(id: Long): Future[Int]
-  def get(id: Long): Future[Option[Expense]]
+  def delete(id: Int): Future[Int]
+  def get(id: Int): Future[Option[Expense]]
   def listAllExpenses: Future[Seq[Expense]]
-  def update(id: Long, expense: Expense) : Future[String]
+  def update(id: Int, expense: Expense) : Future[String]
 }

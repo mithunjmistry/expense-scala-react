@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import java.sql.Timestamp
 
 @Singleton
-class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) extends ExpenseDAO {
+class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAOImpl: UserDAOImpl, expenseTypeDAOImpl: ExpenseTypeDAOImpl) extends ExpenseDAO {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -21,15 +21,20 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) extends
 
   class ExpenseTableDef(tag: Tag) extends Table[Expense](tag, "expense") {
 
-    def id = column[Long]("id", O.PrimaryKey,O.AutoInc)
-    def name = column[String]("name")
+    def id = column[Int]("id", O.PrimaryKey,O.AutoInc)
+    def expense_name = column[String]("expense_name")
     def description = column[String]("description")
     def amount = column[Float]("amount")
-    def created_at = column[Timestamp]("created_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+    def created_at = column[Timestamp]("created_at")
     def updated_at = column[Timestamp]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+    def user_id = column[Int]("user_id")
+    def expense_type_id = column[Int]("expense_type_id")
 
     override def * =
-      (id, name, description, amount, created_at, updated_at) <>(Expense.tupled, Expense.unapply)
+      (id, expense_name, description, amount, created_at, updated_at, user_id, expense_type_id) <>(Expense.tupled, Expense.unapply)
+
+    def user = foreignKey("fk_expense_user", user_id, userDAOImpl.users)(_.id, onDelete=ForeignKeyAction.Cascade, onUpdate=ForeignKeyAction.Cascade)
+    def expense_type = foreignKey("fk_expense_expense_type1", expense_type_id, expenseTypeDAOImpl.expenseTypes)(_.id, onDelete=ForeignKeyAction.Cascade, onUpdate=ForeignKeyAction.Cascade)
   }
 
   val expenses = TableQuery[ExpenseTableDef]
@@ -40,11 +45,11 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) extends
     }
   }
 
-  override def delete(id: Long): Future[Int] = {
+  override def delete(id: Int): Future[Int] = {
     db.run(expenses.filter(_.id === id).delete)
   }
 
-  override def get(id: Long): Future[Option[Expense]] = {
+  override def get(id: Int): Future[Option[Expense]] = {
     db.run(expenses.filter(_.id === id).result.headOption)
   }
 
@@ -52,7 +57,7 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) extends
     db.run(expenses.result)
   }
 
-  override def update(id: Long, expense: Expense): Future[String] = {
+  override def update(id: Int, expense: Expense): Future[String] = {
     db.run(expenses.filter(_.id === id).update(expense)).map(res => "Expense updated successfully")
       .recover{
         case ex: Exception => ex.getCause.getMessage

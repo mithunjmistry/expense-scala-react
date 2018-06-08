@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 
 import play.api.libs.json._
 
-case class Expense(id: Long, name: String, description: String, amount: Float, created_at: Timestamp, updated_at: Timestamp)
+case class Expense(id: Int, expense_name: String, description: String, amount: Float, created_at: Timestamp, updated_at: Timestamp, user_id: Int, expense_type_id: Int)
 
 object Formatters {
 
@@ -19,4 +19,6 @@ object Formatters {
   }
 
   implicit val expenseFormat = Json.format[Expense]
+  implicit val userFormat = Json.format[User]
+  implicit val expenseTypeFormat = Json.format[ExpenseType]
 }
