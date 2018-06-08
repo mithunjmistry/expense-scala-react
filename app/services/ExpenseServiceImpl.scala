@@ -12,11 +12,11 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
     expenseDAO.add(expense)
   }
 
-  def deleteExpense(id: Long): Future[Int] = {
+  def deleteExpense(id: Int): Future[Int] = {
     expenseDAO.delete(id)
   }
 
-  def getExpense(id: Long): Future[Option[Expense]] = {
+  def getExpense(id: Int): Future[Option[Expense]] = {
     expenseDAO.get(id)
   }
 
@@ -24,7 +24,7 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
     expenseDAO.listAllExpenses
   }
 
-  def updateExpense(id: Long, expense: Expense) : Future[String] = {
+  def updateExpense(id: Int, expense: Expense) : Future[String] = {
     expenseDAO.update(id, expense)
   }
 }
