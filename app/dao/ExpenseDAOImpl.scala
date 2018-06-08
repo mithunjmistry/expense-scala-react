@@ -15,8 +15,12 @@ import java.sql.Timestamp
 class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAOImpl: UserDAOImpl, expenseTypeDAOImpl: ExpenseTypeDAOImpl) extends ExpenseDAO {
 
   val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val user = userDAOImpl
+  val expenseType = expenseTypeDAOImpl
 
   import dbConfig._
+  import user.users
+  import expenseType.expenseTypes
   import profile.api._
 
   class ExpenseTableDef(tag: Tag) extends Table[Expense](tag, "expense") {
@@ -24,7 +28,7 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     def id = column[Int]("id", O.PrimaryKey,O.AutoInc)
     def expense_name = column[String]("expense_name")
     def description = column[String]("description")
-    def amount = column[Float]("amount")
+    def amount = column[Double]("amount")
     def created_at = column[Timestamp]("created_at")
     def updated_at = column[Timestamp]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
     def user_id = column[Int]("user_id")
@@ -33,8 +37,8 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     override def * =
       (id, expense_name, description, amount, created_at, updated_at, user_id, expense_type_id) <>(Expense.tupled, Expense.unapply)
 
-    def user = foreignKey("fk_expense_user", user_id, userDAOImpl.users)(_.id, onDelete=ForeignKeyAction.Cascade, onUpdate=ForeignKeyAction.Cascade)
-    def expense_type = foreignKey("fk_expense_expense_type1", expense_type_id, expenseTypeDAOImpl.expenseTypes)(_.id, onDelete=ForeignKeyAction.Cascade, onUpdate=ForeignKeyAction.Cascade)
+    def user = foreignKey("fk_expense_user", user_id, users)(_.id, onDelete=ForeignKeyAction.Cascade, onUpdate=ForeignKeyAction.Cascade)
+    def expense_type = foreignKey("fk_expense_expense_type1", expense_type_id, expenseTypes)(_.id, onDelete=ForeignKeyAction.Cascade, onUpdate=ForeignKeyAction.Cascade)
   }
 
   val expenses = TableQuery[ExpenseTableDef]

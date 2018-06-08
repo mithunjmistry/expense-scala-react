@@ -26,7 +26,7 @@ class UserDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) extends Us
       (id, full_name, email) <>(User.tupled, User.unapply)
   }
 
-  lazy val users = TableQuery[UserTableDef]
+  val users = TableQuery[UserTableDef]
 
   override def add(user: User): Future[String] = {
     db.run(users += user).map(res => "User added successfully.").recover {

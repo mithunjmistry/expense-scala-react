@@ -1,5 +1,7 @@
 package controllers
 
+import java.sql.Timestamp
+
 import javax.inject._
 import model.Expense
 import play.api.libs.json.Json
@@ -11,6 +13,9 @@ import scala.concurrent._
 import ExecutionContext.Implicits.global
 import play.api.Logger
 import views.html.defaultpages.badRequest
+import java.util.Calendar
+
+import scala.language.implicitConversions
 
 @Singleton
 class ExpenseController @Inject()(cc: ControllerComponents, expenseService: ExpenseService) extends AbstractController(cc) {
@@ -23,11 +28,20 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
   }
 
   def addExpense = Action(parse.tolerantFormUrlEncoded) { request => {
-      val name = request.body.get("name").map(_.head).getOrElse("")
-      val description = request.body.get("description").map(_.head).getOrElse("")
-      val amount = request.body.get("amount").map(_.head).getOrElse("")
+
+//      implicit def stringToDouble(x: String) : Double = augmentString(x).toDouble
+//      implicit def stringToInt(x: String) : Int = augmentString(x).toInt
+
+      val expense_name = request.body.get("expense_name").map(_.head).getOrElse("")
+      val description : String = request.body.get("description").map(_.head).getOrElse("")
+      val amount = request.body.get("amount").map(_.head).getOrElse("").toDouble
+      val user_id = request.body.get("user_id").map(_.head).getOrElse("").toInt
+      val expense_type_id = request.body.get("expense_type_id").map(_.head).getOrElse("").toInt
+      val calendar = Calendar.getInstance
+      val now = calendar.getTime
+      val currentTimestamp = new Timestamp(now.getTime)
       try{
-        expenseService.addExpense(Expense(0, name, description, amount.toFloat, null, null))
+        expenseService.addExpense(Expense(0, expense_name, description, amount, currentTimestamp, null, user_id, expense_type_id))
         Ok(Json.toJson("Expense added successfully"))
       }
       catch {
@@ -36,7 +50,7 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
     }
   }
 
-  def deleteExpense(id: Long) = Action {
+  def deleteExpense(id: Int) = Action {
     try{
       expenseService.deleteExpense(id)
       Ok("Expense deleted successfully")
@@ -46,12 +60,17 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
     }
   }
 
-  def updateExpense(id: Long) = Action(parse.tolerantFormUrlEncoded) { request => {
+  def updateExpense(id: Int) = Action(parse.tolerantFormUrlEncoded) { request => {
       try {
-        val name = request.body.get("name").map(_.head).getOrElse("")
-        val description = request.body.get("description").map(_.head).getOrElse("")
-        val amount = request.body.get("amount").map(_.head).getOrElse("")
-        expenseService.updateExpense(id, Expense(id, name, description, amount.toFloat, null, null))
+        val expense_name = request.body.get("expense_name").map(_.head).getOrElse("")
+        val description : String = request.body.get("description").map(_.head).getOrElse("")
+        val amount = request.body.get("amount").map(_.head).getOrElse("").toDouble
+        val user_id = request.body.get("user_id").map(_.head).getOrElse("").toInt
+        val expense_type_id = request.body.get("expense_type_id").map(_.head).getOrElse("").toInt
+        val calendar = Calendar.getInstance
+        val now = calendar.getTime
+        val currentTimestamp = new Timestamp(now.getTime)
+        expenseService.updateExpense(id, Expense(0, expense_name, description, amount, currentTimestamp, null, user_id, expense_type_id))
         Ok("Expense updated successfully")
       }
       catch {

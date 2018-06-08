@@ -9,8 +9,8 @@ GET     /                           controllers.FrontendController.index()
 GET     /api/summary                controllers.HomeController.appSummary
 GET     /api/all/expenses           controllers.ExpenseController.allExpenses
 POST    /api/add/expense            controllers.ExpenseController.addExpense
-DELETE  /api/delete/expense/:id     controllers.ExpenseController.deleteExpense(id: Long)
-POST    /api/update/expense/:id     controllers.ExpenseController.updateExpense(id: Long)
+DELETE  /api/delete/expense/:id     controllers.ExpenseController.deleteExpense(id: Int)
+POST    /api/update/expense/:id     controllers.ExpenseController.updateExpense(id: Int)
 
 
 # Serve static assets under public directory
