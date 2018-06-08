@@ -27,10 +27,10 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
 
     def id = column[Int]("id", O.PrimaryKey,O.AutoInc)
     def expense_name = column[String]("expense_name")
-    def description = column[String]("description")
+    def description = column[Option[String]]("description")
     def amount = column[Double]("amount")
-    def created_at = column[Timestamp]("created_at")
-    def updated_at = column[Timestamp]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+    def created_at = column[Option[Timestamp]]("created_at")
+    def updated_at = column[Option[Timestamp]]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
     def user_id = column[Int]("user_id")
     def expense_type_id = column[Int]("expense_type_id")
 

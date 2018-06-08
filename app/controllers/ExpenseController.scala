@@ -21,7 +21,7 @@ import scala.language.implicitConversions
 class ExpenseController @Inject()(cc: ControllerComponents, expenseService: ExpenseService) extends AbstractController(cc) {
 
   def allExpenses = Action.async { implicit request => {
-    expenseService.listAllExpenses map { implicit expenses =>
+    expenseService.listAllExpenses map { expenses =>
         Ok(Json.toJson(expenses))
       }
     }
@@ -41,7 +41,7 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
       val now = calendar.getTime
       val currentTimestamp = new Timestamp(now.getTime)
       try{
-        expenseService.addExpense(Expense(0, expense_name, description, amount, currentTimestamp, null, user_id, expense_type_id))
+        expenseService.addExpense(Expense(0, expense_name, Some(description), amount, Some(currentTimestamp), null, user_id, expense_type_id))
         Ok(Json.toJson("Expense added successfully"))
       }
       catch {
@@ -70,7 +70,7 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
         val calendar = Calendar.getInstance
         val now = calendar.getTime
         val currentTimestamp = new Timestamp(now.getTime)
-        expenseService.updateExpense(id, Expense(0, expense_name, description, amount, currentTimestamp, null, user_id, expense_type_id))
+        expenseService.updateExpense(id, Expense(0, expense_name, Some(description), amount, Some(currentTimestamp), null, user_id, expense_type_id))
         Ok("Expense updated successfully")
       }
       catch {

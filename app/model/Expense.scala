@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 
 import play.api.libs.json._
 
-case class Expense(id: Int, expense_name: String, description: String = "", amount: Double, created_at: Timestamp, updated_at: Timestamp, user_id: Int, expense_type_id: Int = 1)
+case class Expense(id: Int, expense_name: String, description: Option[String] = None, amount: Double, created_at: Option[Timestamp], updated_at: Option[Timestamp], user_id: Int, expense_type_id: Int = 1)
 
 object Formatters {
 
