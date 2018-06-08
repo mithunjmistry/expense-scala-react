@@ -1,14 +1,13 @@
 package dao
 
 import javax.inject.{Inject, Singleton}
-import model.Expense
+import model.{Expense, ExpenseType, User}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import java.sql.Timestamp
 
 @Singleton
@@ -57,8 +56,20 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     db.run(expenses.filter(_.id === id).result.headOption)
   }
 
-  override def listAllExpenses: Future[Seq[Expense]] = {
-    db.run(expenses.result)
+  override def listAllExpenses: Future[Seq[(Expense, ExpenseType, User)]] = {
+//    val q : Query[(ExpenseTableDef, expenseType.ExpenseTypeTableDef), (Expense, ExpenseType), Seq] =
+//    val q = for {
+//      (e, et) <- expenses join  expenseType.expenseTypes on (_.expense_type_id === _.id)
+//      (_, u) <- expenses join user.users on (_.user_id === _.id)
+//    } yield (e, et, u)
+      val q = for {
+        e <- expenses
+        et <- e.expense_type
+        u <- e.user
+      } yield (e, et, u)
+    db.run(q.result)
+//    db.run(q.join(user.users).on(_._1.user_id === _.id).result)
+//      db.run(expenses.join(expenseType.expenseTypes).on(_.expense_type_id === _.id).result)
   }
 
   override def update(id: Int, expense: Expense): Future[String] = {

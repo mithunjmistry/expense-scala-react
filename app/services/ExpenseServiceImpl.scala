@@ -1,7 +1,7 @@
 package services
 
 import dao.ExpenseDAO
-import model.Expense
+import model.{Expense, ExpenseType, User}
 import javax.inject.{Inject, Singleton}
 
 import scala.concurrent.Future
@@ -20,7 +20,7 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
     expenseDAO.get(id)
   }
 
-  def listAllExpenses: Future[Seq[Expense]] = {
+  def listAllExpenses: Future[Seq[(Expense, ExpenseType, User)]] = {
     expenseDAO.listAllExpenses
   }
 
