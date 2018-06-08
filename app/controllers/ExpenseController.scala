@@ -21,7 +21,7 @@ import scala.language.implicitConversions
 class ExpenseController @Inject()(cc: ControllerComponents, expenseService: ExpenseService) extends AbstractController(cc) {
 
   def allExpenses = Action.async { implicit request => {
-    expenseService.listAllExpenses map { expenses =>
+    expenseService.listAllExpenses(1) map { expenses =>
         Ok(Json.toJson(expenses))
       }
     }

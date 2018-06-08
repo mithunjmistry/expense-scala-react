@@ -56,14 +56,14 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     db.run(expenses.filter(_.id === id).result.headOption)
   }
 
-  override def listAllExpenses: Future[Seq[(Expense, ExpenseType, User)]] = {
+  override def listAllExpenses(userID: Int): Future[Seq[(Expense, ExpenseType, User)]] = {
 //    val q : Query[(ExpenseTableDef, expenseType.ExpenseTypeTableDef), (Expense, ExpenseType), Seq] =
 //    val q = for {
 //      (e, et) <- expenses join  expenseType.expenseTypes on (_.expense_type_id === _.id)
 //      (_, u) <- expenses join user.users on (_.user_id === _.id)
 //    } yield (e, et, u)
       val q = for {
-        e <- expenses
+        e <- expenses.filter(_.user_id === userID)
         et <- e.expense_type
         u <- e.user
       } yield (e, et, u)

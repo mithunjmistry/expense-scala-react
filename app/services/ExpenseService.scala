@@ -10,6 +10,6 @@ trait ExpenseService {
   def addExpense(expense: Expense): Future[String]
   def deleteExpense(id: Int): Future[Int]
   def getExpense(id: Int): Future[Option[Expense]]
-  def listAllExpenses: Future[Seq[(Expense, ExpenseType, User)]]
+  def listAllExpenses(userID: Int): Future[Seq[(Expense, ExpenseType, User)]]
   def updateExpense(id: Int, expense: Expense) : Future[String]
 }
