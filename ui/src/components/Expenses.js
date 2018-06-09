@@ -2,6 +2,7 @@ import React from 'react';
 import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table } from 'react-bootstrap';
 import {withRouter} from "react-router-dom";
 import Pagination from "react-js-pagination";
+import {connect} from "react-redux";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -20,6 +21,10 @@ class Expenses extends React.Component{
       message: false,
       activePage: 1
   };
+
+  componentDidMount(){
+    console.log(this.props.filter);
+  }
 
   changeRoute = (routeURL) => {
     this.props.history.push(routeURL);
@@ -156,4 +161,10 @@ class Expenses extends React.Component{
   }
 }
 
-export default withRouter(Expenses);
+const mapStateToProps = (state) => {
+  return {
+    filter: state.filter
+  };
+};
+
+export default connect(mapStateToProps)(withRouter(Expenses));
