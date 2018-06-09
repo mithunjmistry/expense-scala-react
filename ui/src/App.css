@@ -14,3 +14,15 @@
 .minimum-height{
   min-height: 420px;
 }
+
+.header-div{
+  background-color: #f7f7f7;
+  color: #333333;
+  height: 40px;
+}
+
+.header-span{
+  line-height: 40px;
+  vertical-align: middle;
+  padding-left: 20px;
+}

@@ -1,5 +1,18 @@
 import React from 'react';
-import { Grid, Col, Row, Button } from 'react-bootstrap';
+import { Grid, Col, Row, Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import Expenses from "./Expenses";
+import Statistics from "./Statistics";
+
+const SelectGroup = ({options, label, ...props}) => (
+  <FormGroup>
+    <ControlLabel>{label}</ControlLabel>
+    <FormControl componentClass="select" {...props}>
+      {options.map((v) => (
+        <option value={v} key={v}>{v}</option>
+      ))}
+    </FormControl>
+  </FormGroup>
+);
 
 export default class HomePage extends React.Component{
 
@@ -16,15 +29,17 @@ export default class HomePage extends React.Component{
     const {message} = this.state;
 
     return (
-      <Grid className={"minimum-height"}>
+      <div className={"minimum-height container-fluid"}>
         <Row>
-          <Col lg={12} md={12}>
-            <p>This is from React</p>
-            <Button onClick={this.handleButtonClick}>Click me</Button>
-            {message && <p>Button clicked.</p>}
+          <Col lg={10} md={10}>
+            <Expenses />
+          </Col>
+
+          <Col lg={2} md={2} xsHidden mdHidden>
+            <Statistics/>
           </Col>
         </Row>
-      </Grid>
+      </div>
     )
   }
 }
