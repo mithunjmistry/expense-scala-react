@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import Moment from 'moment-timezone';
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import axios from "../api/axiosInstance";
-import {addExpenseAPI} from "../api/apiURLs";
+import {addExpenseAPI, allExpenseTypesAPI} from "../api/apiURLs";
 
 const FieldGroup = ({id, label, componentType, ...props}) => (
   <FormGroup controlId={id}>
@@ -20,21 +20,32 @@ class ExpenseBase extends React.Component {
   state = {
       title: "Expense",
       date: Moment().tz('America/Los_Angeles'),
-      expenseTypes: ["general", "grocery"],
+      expenseTypes: ["general"],
       otherExpenseType: false,
       expenseTypeGlyph: true,
       error: false,
       saveBtn: false
   };
 
+  getExpenseTypes = () => {
+    axios.get(allExpenseTypesAPI).then((response) => {
+      const expenseTypes = response.data;
+      this.setState(() => ({expenseTypes}));
+    }).catch((error) => {
+      console.log(error.response);
+    });
+  };
+
   componentDidMount(){
     let action = this.props.match.params.eaction;
     if(action === "add"){
       this.setState(() => ({title: ADD_EXPENSE}));
+      this.getExpenseTypes();
     }
     else if(action === "edit"){
       let expenseID = this.props.match.params.expenseID;
       this.setState(() => ({title: EDIT_EXPENSE}));
+      this.getExpenseTypes();
     }
     else{
       this.props.history.push("/");

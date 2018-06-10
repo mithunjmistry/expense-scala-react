@@ -13,6 +13,6 @@ trait ExpenseTypeDAO {
   def get(id: Int): Future[Option[ExpenseType]]
   def findExpenseTypeId(expense_type_name: String): DBIO[Option[Int]]
   def findOrCreateExpenseTypeID(expense_type_name: String): DBIO[Int]
-  def listAllExpenseTypes: Future[Seq[ExpenseType]]
+  def listAllExpenseTypes: Future[Seq[String]]
   def update(id: Int, expenseType: ExpenseType) : Future[String]
 }

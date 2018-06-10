@@ -41,8 +41,8 @@ class ExpenseTypeDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) ext
     db.run(expenseTypes.filter(_.id === id).result.headOption)
   }
 
-  override def listAllExpenseTypes: Future[Seq[ExpenseType]] = {
-    db.run(expenseTypes.result)
+  override def listAllExpenseTypes: Future[Seq[String]] = {
+    db.run(expenseTypes.map(_.expense_type_name).result)
   }
 
   override def findExpenseTypeId(expense_type_name: String): DBIO[Option[Int]] =
