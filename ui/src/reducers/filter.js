@@ -1,4 +1,4 @@
-import {ALL, CHANGE_MONTH, CHANGE_SORT_BY, CHANGE_TYPE, DATE} from "../api/strings";
+import {ALL, CHANGE_FILTER, DATE} from "../api/strings";
 
 const filterDefaultState = {
     sortBy: DATE,
@@ -8,20 +8,9 @@ const filterDefaultState = {
 
 export default (state = filterDefaultState, action) => {
   switch (action.type) {
-    case CHANGE_SORT_BY:
+    case CHANGE_FILTER:
       return {
-        ...state,
-        sortBy: action.payload
-      };
-    case CHANGE_TYPE:
-      return {
-        ...state,
-        type: action.payload
-      };
-    case CHANGE_MONTH:
-      return {
-        ...state,
-        month: action.payload
+        ...action.payload
       };
     default:
       return state;

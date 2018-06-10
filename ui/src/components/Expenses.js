@@ -1,8 +1,10 @@
 import React from 'react';
-import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table } from 'react-bootstrap';
+import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table, Form } from 'react-bootstrap';
 import {withRouter} from "react-router-dom";
 import Pagination from "react-js-pagination";
 import {connect} from "react-redux";
+import {changeFilters} from "../actions/filter"
+import {ALL, DATE} from "../api/strings";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -19,11 +21,19 @@ class Expenses extends React.Component{
 
   state = {
       message: false,
-      activePage: 1
+      activePage: 1,
+      sortBy: DATE,
+      month: ALL,
+      type: ALL
   };
 
   componentDidMount(){
-    console.log(this.props.filter);
+    const {sortBy, month, type} = this.props.filter;
+    this.setState(() => ({
+      sortBy,
+      month,
+      type
+    }));
   }
 
   changeRoute = (routeURL) => {
@@ -34,30 +44,65 @@ class Expenses extends React.Component{
     this.setState(() => ({activePage: pageNumber}));
   };
 
+  handleFilterFormSubmit = (e) => {
+    e.preventDefault();
+    const sortBy = e.target.sortBy.value;
+    const month = e.target.filterDate.value;
+    const type = e.target.filterType.value;
+
+    const payload = {
+        sortBy,
+        month,
+        type
+    };
+    this.props.dispatch(changeFilters(payload));
+    this.setState(() => ({
+      sortBy,
+      month,
+      type
+    }));
+  };
+
+  handleSelectChange = (selectName, e) => {
+    const value = e.target.value;
+    console.log(value);
+    if(selectName === "sortBy"){
+      this.setState(() => ({sortBy: value}));
+    }
+    else if(selectName === "filterMonth"){
+      this.setState(() => ({month: value}));
+    }
+    else if(selectName === "filterType"){
+      this.setState(() => ({type: value}));
+    }
+  };
+
   render(){
 
     return (
       <div>
         <Row>
           <Col lg={12} md={12} sm={12} xs={12}>
-            <Row>
-              <Col lg={2} md={2} sm={4}>
-                <SelectGroup options={["date", "amount"]} label={"sort by:"}/>
-              </Col>
+            <Form onSubmit={this.handleFilterFormSubmit}>
+              <Row>
+                <Col lg={2} md={2} sm={4}>
+                  <SelectGroup options={["date", "amount"]} label={"sort by:"} value={this.state.sortBy} onChange={(e) => this.handleSelectChange("sortBy", e)} name={"sortBy"}/>
+                </Col>
 
-              <Col lg={2} md={2} sm={4}>
-                <SelectGroup options={["all", "06-2018", "05-2018"]} label={"month:"}/>
-              </Col>
+                <Col lg={2} md={2} sm={4}>
+                  <SelectGroup options={["all", "06-2018", "05-2018"]} label={"month:"} value={this.state.month} onChange={(e) => this.handleSelectChange("filterMonth", e)} name={"filterDate"}/>
+                </Col>
 
-              <Col lg={2} md={2} sm={4}>
-                <SelectGroup options={["all", "grocery", "general"]} label={"type:"}/>
-              </Col>
+                <Col lg={2} md={2} sm={4}>
+                  <SelectGroup options={["all", "grocery", "general"]} label={"type:"} value={this.state.type} onChange={(e) => this.handleSelectChange("filterType", e)} name={"filterType"}/>
+                </Col>
 
-              <Col lg={2} md={2} sm={12} xs={12}>
-                <ControlLabel className={"apply-change-label"}>apply changes</ControlLabel>
-                <Button>apply</Button>
-              </Col>
-            </Row>
+                <Col lg={2} md={2} sm={12} xs={12}>
+                  <ControlLabel className={"apply-change-label"}>apply changes</ControlLabel>
+                  <Button type={"submit"}>apply</Button>
+                </Col>
+              </Row>
+            </Form>
 
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
