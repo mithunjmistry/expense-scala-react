@@ -20,7 +20,8 @@ class ExpenseBase extends React.Component {
       date: moment(),
       expenseTypes: ["general", "grocery"],
       otherExpenseType: false,
-      expenseTypeGlyph: true
+      expenseTypeGlyph: true,
+      error: false
   };
 
   componentDidMount(){
@@ -49,9 +50,29 @@ class ExpenseBase extends React.Component {
     this.setState((prevState) => ({otherExpenseType: !prevState.otherExpenseType, expenseTypeGlyph: !prevState.expenseTypeGlyph}));
   };
 
+  handleFormSubmit = (e) => {
+      e.preventDefault();
+      const expenseName = e.target.expenseName.value;
+      const description = e.target.description.value;
+      const amount = e.target.amount.value;
+      const date = this.state.date;
+      let expenseType = e.target.expenseType.value;
+      if(this.state.otherExpenseType){
+        expenseType = e.target.otherExpenseType.value;
+      }
+
+      if(expenseName.length > 0 && amount.length > 0){
+        this.setState(() => ({error: false}));
+      }
+      else{
+        this.setState(() => ({error: true}));
+      }
+      console.log(`${expenseName} ${description} ${amount} ${date} ${expenseType}`);
+  };
+
   render() {
 
-    const {title} = this.state;
+    const {title, error} = this.state;
 
     return (
       <div className={"minimum-height container-fluid"}>
@@ -61,23 +82,29 @@ class ExpenseBase extends React.Component {
               <Glyphicon glyph={"chevron-left"}/> Back
             </Button>
             <h4 className={"gray-underline"}>{title}</h4>
-            <Form>
+            <Form onSubmit={this.handleFormSubmit}>
               <FieldGroup
                 id={"expense-name"}
                 label={"expense name"}
                 componentType={"input"}
+                name={"expenseName"}
               />
 
               <FieldGroup
                 id={"description"}
                 label={"description"}
                 componentType={"textarea"}
+                name={"description"}
               />
 
               <FieldGroup
                 id={"amount"}
                 label={"amount (in $)"}
                 componentType={"input"}
+                name={"amount"}
+                type="number"
+                step="0.01"
+                min={0}
               />
 
               <Row>
@@ -95,7 +122,7 @@ class ExpenseBase extends React.Component {
                   <FormGroup>
                     <ControlLabel>expense type</ControlLabel>
                     <InputGroup>
-                      <FormControl componentClass={"select"}>
+                      <FormControl componentClass={"select"} name={"expenseType"}>
                         {this.state.expenseTypes.map((v) => (
                           <option key={v}>{v}</option>
                         ))}
@@ -114,6 +141,7 @@ class ExpenseBase extends React.Component {
                     id={"other-expense-type"}
                     label={"other expense type"}
                     componentType={"input"}
+                    name={"otherExpenseType"}
                   />
                 </Col>}
 
@@ -128,10 +156,17 @@ class ExpenseBase extends React.Component {
 
               </Row>
 
-              <Button bsStyle={"primary"}>
+              {error &&
+              <Row>
+                <Col lg={12} md={12} sm={12} xs={12}>
+                  <p className={"red-color"}>Expense Name and Amount are required.</p>
+                </Col>
+              </Row>}
+
+              <Button bsStyle={"primary"} type={"submit"}>
                 Save
               </Button>
-              <Button className={"margin-left-one"}>
+              <Button className={"margin-left-one"} onClick={() => this.changeRoute("/")}>
                 Cancel
               </Button>
             </Form>
