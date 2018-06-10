@@ -45,6 +45,17 @@ class ExpenseTypeDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) ext
     db.run(expenseTypes.result)
   }
 
+  override def findExpenseTypeId(expense_type_name: String): DBIO[Option[Int]] =
+    expenseTypes.filter(_.expense_type_name === expense_type_name).map(_.id).result.headOption
+
+  override def findOrCreateExpenseTypeID(expense_type_name: String): DBIO[Int] =
+    findExpenseTypeId(expense_type_name).flatMap { expenseTypeID =>
+      expenseTypeID match {
+        case Some(id) => DBIO.successful(id)
+        case None     => expenseTypes += ExpenseType(0, expense_type_name)
+      }
+    }
+
   override def update(id: Int, expenseType: ExpenseType): Future[String] = {
     db.run(expenseTypes.filter(_.id === id).update(expenseType)).map(res => "ExpenseType updated successfully")
       .recover{

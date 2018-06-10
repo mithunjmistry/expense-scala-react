@@ -80,6 +80,7 @@ class ExpenseBase extends React.Component {
             this.props.history.push("/");
           })
           .catch((error) => {
+            this.setState(() => ({saveBtn: false}));
             console.log(error.response);
           });
       }

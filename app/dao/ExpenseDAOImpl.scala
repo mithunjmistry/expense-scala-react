@@ -43,7 +43,11 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
   val expenses = TableQuery[ExpenseTableDef]
 
   override def add(expense: Expense): Future[String] = {
-    db.run(expenses += expense).map(res => "Expense added successfully.").recover {
+    val setup = for {
+      eid <- expenseType.findOrCreateExpenseTypeID("General")
+      rowAdded <- expenses += Expense(0, "test", None, 190, null, null, 1, eid)
+    } yield rowAdded
+    db.run(setup).map(res => "Expense added successfully.").recover {
       case ex: Exception => ex.getCause.getMessage
     }
   }

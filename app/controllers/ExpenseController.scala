@@ -32,16 +32,16 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
 //      implicit def stringToDouble(x: String) : Double = augmentString(x).toDouble
 //      implicit def stringToInt(x: String) : Int = augmentString(x).toInt
 
-
-
       val expense_name = (request.body \ "expense_name").as[String]
       val description = (request.body \ "description").as[String]
       val amount = (request.body \ "amount").as[String].toDouble
       val user_id = (request.body \ "user_id").as[Int]
-      val expense_type_id = (request.body \ "expense_type_id").as[Int]
-      val calendar = Calendar.getInstance
-      val now = calendar.getTime
-      val currentTimestamp = new Timestamp(now.getTime)
+      val expense_type = (request.body \ "expense_type_id").as[String]
+
+//      val calendar = Calendar.getInstance
+//      val now = calendar.getTime
+//      val currentTimestamp = new Timestamp(now.getTime)
+//      Logger.info(currentTimestamp.toString)
       try{
         expenseService.addExpense(Expense(0, expense_name, Some(description), amount, Some(currentTimestamp), null, user_id, expense_type_id))
         Ok(Json.toJson("Expense added successfully"))
