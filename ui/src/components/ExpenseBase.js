@@ -23,7 +23,8 @@ class ExpenseBase extends React.Component {
       expenseTypes: ["general", "grocery"],
       otherExpenseType: false,
       expenseTypeGlyph: true,
-      error: false
+      error: false,
+      saveBtn: false
   };
 
   componentDidMount(){
@@ -64,7 +65,7 @@ class ExpenseBase extends React.Component {
       }
 
       if(expenseName.length > 0 && amount.length > 0){
-        this.setState(() => ({error: false}));
+        this.setState(() => ({error: false, saveBtn: true}));
         const data = {
           expense_name: expenseName,
           description,
@@ -72,19 +73,19 @@ class ExpenseBase extends React.Component {
           user_id: 1,
           expense_type_id: 1
         };
-        const headers = {'Content-Type': "application/x-www-form-urlencoded"};
+        const headers = {"Content-Type": "application/json"};
         axios.post(addExpenseAPI,data, {headers: {...headers}})
           .then((response) => {
             console.log(response.data);
+            this.props.history.push("/");
           })
           .catch((error) => {
             console.log(error.response);
           });
       }
       else{
-        this.setState(() => ({error: true}));
+        this.setState(() => ({error: true, saveBtn: false}));
       }
-      console.log(`${expenseName} ${description} ${amount} ${date} ${expenseType}`);
   };
 
   render() {
@@ -180,10 +181,10 @@ class ExpenseBase extends React.Component {
                 </Col>
               </Row>}
 
-              <Button bsStyle={"primary"} type={"submit"}>
+              <Button bsStyle={"primary"} type={"submit"} disabled={this.state.saveBtn}>
                 Save
               </Button>
-              <Button className={"margin-left-one"} onClick={() => this.changeRoute("/")}>
+              <Button className={"margin-left-one"} onClick={() => this.changeRoute("/")} disabled={this.state.saveBtn}>
                 Cancel
               </Button>
             </Form>
