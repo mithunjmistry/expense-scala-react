@@ -4,7 +4,9 @@ import { withRouter } from 'react-router-dom';
 import {ADD_EXPENSE, EDIT_EXPENSE} from "../api/strings";
 import DatePicker from 'react-datepicker';
 import moment from "moment";
-import 'react-datepicker/dist/react-datepicker-cssmodules.css'
+import 'react-datepicker/dist/react-datepicker-cssmodules.css';
+import axios from "../api/axiosInstance";
+import {addExpenseAPI} from "../api/apiURLs";
 
 const FieldGroup = ({id, label, componentType, ...props}) => (
   <FormGroup controlId={id}>
@@ -63,6 +65,21 @@ class ExpenseBase extends React.Component {
 
       if(expenseName.length > 0 && amount.length > 0){
         this.setState(() => ({error: false}));
+        const data = {
+          expense_name: expenseName,
+          description,
+          amount,
+          user_id: 1,
+          expense_type_id: 1
+        };
+        const headers = {'Content-Type': "application/x-www-form-urlencoded"};
+        axios.post(addExpenseAPI,data, {headers: {...headers}})
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.log(error.response);
+          });
       }
       else{
         this.setState(() => ({error: true}));
