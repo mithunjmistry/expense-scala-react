@@ -1,5 +1,7 @@
 package services
 
+import java.sql.Timestamp
+
 import dao.ExpenseDAO
 import model.{Expense, ExpenseType, User}
 import javax.inject.{Inject, Singleton}
@@ -8,8 +10,8 @@ import scala.concurrent.Future
 
 @Singleton
 class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseService {
-  def addExpense(expense: Expense): Future[String] = {
-    expenseDAO.add(expense)
+  def addExpense(expenseName: String, description: Option[String] = None, amount: Double, date: Timestamp, expense_type: String, user_id: Int = 1): Future[String] = {
+    expenseDAO.add(expenseName, description.getOrElse(""), amount, date, expense_type, user_id)
   }
 
   def deleteExpense(id: Int): Future[Int] = {

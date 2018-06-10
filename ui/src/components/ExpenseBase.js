@@ -3,7 +3,7 @@ import { Col, Row, Button, Glyphicon, FormGroup, FormControl, ControlLabel, Form
 import { withRouter } from 'react-router-dom';
 import {ADD_EXPENSE, EDIT_EXPENSE} from "../api/strings";
 import DatePicker from 'react-datepicker';
-import moment from "moment";
+import Moment from 'moment-timezone';
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import axios from "../api/axiosInstance";
 import {addExpenseAPI} from "../api/apiURLs";
@@ -19,7 +19,7 @@ class ExpenseBase extends React.Component {
 
   state = {
       title: "Expense",
-      date: moment(),
+      date: Moment().tz('America/Los_Angeles'),
       expenseTypes: ["general", "grocery"],
       otherExpenseType: false,
       expenseTypeGlyph: true,
@@ -71,7 +71,8 @@ class ExpenseBase extends React.Component {
           description,
           amount,
           user_id: 1,
-          expense_type_id: 1
+          expenseType,
+          date
         };
         const headers = {"Content-Type": "application/json"};
         axios.post(addExpenseAPI,data, {headers: {...headers}})
@@ -134,6 +135,7 @@ class ExpenseBase extends React.Component {
                       selected={this.state.date}
                       onChange={this.handleChange}
                       className={"form-control"}
+                      name={"date"}
                     />
                   </FormGroup>
                 </Col>

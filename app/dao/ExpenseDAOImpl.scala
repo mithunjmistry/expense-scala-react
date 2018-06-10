@@ -42,10 +42,10 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
 
   val expenses = TableQuery[ExpenseTableDef]
 
-  override def add(expense: Expense): Future[String] = {
+  override def add(expenseName: String, description: String, amount: Double, date: Timestamp, expense_type: String, user_id: Int): Future[String] = {
     val setup = for {
-      eid <- expenseType.findOrCreateExpenseTypeID("General")
-      rowAdded <- expenses += Expense(0, "test", None, 190, null, null, 1, eid)
+      eid <- expenseType.findOrCreateExpenseTypeID(expense_type)
+      rowAdded <- expenses += Expense(0, expenseName, Some(description), amount, Some(date), null, user_id, eid)
     } yield rowAdded
     db.run(setup).map(res => "Expense added successfully.").recover {
       case ex: Exception => ex.getCause.getMessage

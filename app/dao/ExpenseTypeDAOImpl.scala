@@ -48,11 +48,13 @@ class ExpenseTypeDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider) ext
   override def findExpenseTypeId(expense_type_name: String): DBIO[Option[Int]] =
     expenseTypes.filter(_.expense_type_name === expense_type_name).map(_.id).result.headOption
 
+  lazy val insertNewExpenseType = expenseTypes returning expenseTypes.map(_.id)
+
   override def findOrCreateExpenseTypeID(expense_type_name: String): DBIO[Int] =
     findExpenseTypeId(expense_type_name).flatMap { expenseTypeID =>
       expenseTypeID match {
         case Some(id) => DBIO.successful(id)
-        case None     => expenseTypes += ExpenseType(0, expense_type_name)
+        case None     => insertNewExpenseType += ExpenseType(0, expense_type_name)
       }
     }
 
