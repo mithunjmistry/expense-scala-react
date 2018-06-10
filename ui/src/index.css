@@ -3,3 +3,85 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.header-div{
+  background-color: #f7f7f7;
+  color: #333333;
+  height: 40px;
+  margin-bottom: 1%;
+  font-size: 1.2em;
+}
+
+.header-span{
+  line-height: 40px;
+  vertical-align: middle;
+  padding-left: 20px;
+}
+
+.minimum-height{
+  min-height: 420px;
+}
+
+@media(max-width: 990px){
+  .apply-change-label{
+    display: none;
+  }
+}
+
+.add-expense-btn{
+  margin-top: 20px;
+  margin-bottom: 1%;
+}
+
+.margin-left-five{
+  margin-left: 5%;
+}
+
+.margin-left-one{
+  margin-left: 5px;
+}
+
+.text-center{
+  text-align: center;
+}
+
+.gray-underline{
+  text-decoration: underline;
+  text-decoration-color: gray;
+}
+
+.no-border{
+  border: 0 !important;
+}
+
+.header-div a{
+  color: #333333 !important;
+}
+
+.react-datepicker {
+  font-size: 1.3rem !important;
+}
+
+.react-datepicker__current-month {
+  font-size: 1.5rem !important;
+}
+
+.react-datepicker__header {
+  padding-top: 6px !important;
+}
+
+.react-datepicker__navigation {
+  top: 13px !important;
+}
+
+.react-datepicker__day-name, .react-datepicker__day {
+  margin: 0.5rem !important;
+}
+
+.margin-bottom-one{
+  margin-bottom: 1%;
+}
+
+.red-color{
+  color: red;
+}

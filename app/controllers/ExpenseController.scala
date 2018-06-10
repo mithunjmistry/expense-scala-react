@@ -27,16 +27,18 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
     }
   }
 
-  def addExpense = Action(parse.tolerantFormUrlEncoded) { request => {
+  def addExpense = Action(parse.json) { request => {
 
 //      implicit def stringToDouble(x: String) : Double = augmentString(x).toDouble
 //      implicit def stringToInt(x: String) : Int = augmentString(x).toInt
 
-      val expense_name = request.body.get("expense_name").map(_.head).getOrElse("")
-      val description : String = request.body.get("description").map(_.head).getOrElse("")
-      val amount = request.body.get("amount").map(_.head).getOrElse("").toDouble
-      val user_id = request.body.get("user_id").map(_.head).getOrElse("").toInt
-      val expense_type_id = request.body.get("expense_type_id").map(_.head).getOrElse("").toInt
+
+
+      val expense_name = (request.body \ "expense_name").as[String]
+      val description = (request.body \ "description").as[String]
+      val amount = (request.body \ "amount").as[String].toDouble
+      val user_id = (request.body \ "user_id").as[Int]
+      val expense_type_id = (request.body \ "expense_type_id").as[Int]
       val calendar = Calendar.getInstance
       val now = calendar.getTime
       val currentTimestamp = new Timestamp(now.getTime)
