@@ -29,4 +29,8 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
   def updateExpense(id: Int, expense: Expense) : Future[String] = {
     expenseDAO.update(id, expense)
   }
+
+  def getAllDates : Vector[String] = {
+    expenseDAO.getAllDates
+  }
 }

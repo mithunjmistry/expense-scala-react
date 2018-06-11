@@ -6,9 +6,10 @@ import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.sql.Timestamp
+import scala.concurrent.duration._
 
 @Singleton
 class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAOImpl: UserDAOImpl, expenseTypeDAOImpl: ExpenseTypeDAOImpl) extends ExpenseDAO {
@@ -81,5 +82,10 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
       .recover{
         case ex: Exception => ex.getCause.getMessage
       }
+  }
+
+  override def getAllDates : Vector[String] = {
+    val action = sql""" SELECT DISTINCT(DATE(created_at)) FROM expense """.as[String]
+    Await.result(db.run(action), 2 seconds)
   }
 }

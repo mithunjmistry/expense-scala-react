@@ -14,4 +14,5 @@ trait ExpenseDAO {
   def get(id: Int): Future[Option[Expense]]
   def listAllExpenses(userID: Int): Future[Seq[(Expense, ExpenseType, User)]]
   def update(id: Int, expense: Expense) : Future[String]
+  def getAllDates : Vector[String]
 }
