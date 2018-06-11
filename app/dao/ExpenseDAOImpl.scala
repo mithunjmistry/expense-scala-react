@@ -9,6 +9,10 @@ import slick.sql.SqlProfile.ColumnOption.SqlType
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.sql.Timestamp
+
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone.UTC
+
 import scala.concurrent.duration._
 
 @Singleton
@@ -25,12 +29,21 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
 
   class ExpenseTableDef(tag: Tag) extends Table[Expense](tag, "expense") {
 
+    object CustomColumnTypes {
+      implicit val jodaDateTimeType =
+        MappedColumnType.base[DateTime, Timestamp](
+          dt => new Timestamp(dt.getMillis),
+          ts => new DateTime(ts.getTime, UTC)
+        )
+    }
+    import CustomColumnTypes._
+
     def id = column[Int]("id", O.PrimaryKey,O.AutoInc)
     def expense_name = column[String]("expense_name")
     def description = column[Option[String]]("description")
     def amount = column[Double]("amount")
-    def created_at = column[Option[Timestamp]]("created_at")
-    def updated_at = column[Option[Timestamp]]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+    def created_at = column[Option[DateTime]]("created_at")
+    def updated_at = column[Option[DateTime]]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
     def user_id = column[Int]("user_id")
     def expense_type_id = column[Int]("expense_type_id")
 
@@ -43,7 +56,7 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
 
   val expenses = TableQuery[ExpenseTableDef]
 
-  override def add(expenseName: String, description: String, amount: Double, date: Timestamp, expense_type: String, user_id: Int): Future[String] = {
+  override def add(expenseName: String, description: String, amount: Double, date: DateTime, expense_type: String, user_id: Int): Future[String] = {
     val setup = for {
       eid <- expenseType.findOrCreateExpenseTypeID(expense_type)
       rowAdded <- expenses += Expense(0, expenseName, Some(description), amount, Some(date), null, user_id, eid)
@@ -61,20 +74,32 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     db.run(expenses.filter(_.id === id).result.headOption)
   }
 
-  override def listAllExpenses(userID: Int): Future[Seq[(Expense, ExpenseType, User)]] = {
-//    val q : Query[(ExpenseTableDef, expenseType.ExpenseTypeTableDef), (Expense, ExpenseType), Seq] =
-//    val q = for {
-//      (e, et) <- expenses join  expenseType.expenseTypes on (_.expense_type_id === _.id)
-//      (_, u) <- expenses join user.users on (_.user_id === _.id)
-//    } yield (e, et, u)
-      val q = for {
-        e <- expenses.filter(_.user_id === userID)
-        et <- e.expense_type
-        u <- e.user
-      } yield (e, et, u)
+  override def listAllExpenses(userID: Int, etype: Option[String], month: Option[String]): Future[Seq[(Expense, ExpenseType, User)]] = {
+
+    implicit val jodaDateTimeType =
+    MappedColumnType.base[DateTime, Timestamp](
+      dt => new Timestamp(dt.getMillis),
+      ts => new DateTime(ts.getTime, UTC)
+    )
+
+    val q = for {
+      e <- expenses.filter(_.user_id === userID)
+                    .filter(ef => month match {
+                      case Some(m) => {
+                        val monthYear : Array[String] = m.split("-")
+                        val startDate = new DateTime(monthYear(1).toInt, monthYear(0).toInt, 1, 0, 0, 0, 0)
+                        val endDate = startDate.plusMonths(1)
+                        ef.created_at >= startDate && ef.created_at < endDate
+                      }
+                      case _ => ef.created_at === ef.created_at
+                    })
+      et <- e.expense_type.filter(etf => etype match {
+        case Some(expense_type) => etf.expense_type_name === expense_type.toString
+        case _ => etf.expense_type_name === etf.expense_type_name
+      })
+      u <- e.user
+    } yield (e, et, u)
     db.run(q.sortBy(_._1.created_at.desc).result)
-//    db.run(q.join(user.users).on(_._1.user_id === _.id).result)
-//      db.run(expenses.join(expenseType.expenseTypes).on(_.expense_type_id === _.id).result)
   }
 
   override def update(id: Int, expense: Expense): Future[String] = {
@@ -85,7 +110,7 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
   }
 
   override def getAllDates : Vector[String] = {
-    val action = sql""" SELECT DISTINCT(DATE(created_at)) FROM expense """.as[String]
+    val action = sql""" select distinct(DATE_FORMAT(created_at,'%m-%Y')) from expense order by created_at DESC """.as[String]
     Await.result(db.run(action), 2 seconds)
   }
 }

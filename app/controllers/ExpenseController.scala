@@ -14,17 +14,18 @@ import ExecutionContext.Implicits.global
 import play.api.Logger
 import views.html.defaultpages.badRequest
 import java.util.Calendar
-
 import java.text.SimpleDateFormat
 import java.util.Date
+
+import org.joda.time.DateTime
 
 import scala.language.implicitConversions
 
 @Singleton
 class ExpenseController @Inject()(cc: ControllerComponents, expenseService: ExpenseService) extends AbstractController(cc) {
 
-  def allExpenses = Action.async { implicit request => {
-    expenseService.listAllExpenses(1) map { expenses =>
+  def allExpenses(etype: Option[String] = None, month: Option[String] = None) = Action.async { implicit request => {
+    expenseService.listAllExpenses(1, etype, month) map { expenses =>
         Ok(Json.toJson(expenses))
       }
     }
@@ -44,7 +45,7 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
       val date : Date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(created_at_json)
       val currentTimestamp = new Timestamp(date.getTime)
       try{
-        expenseService.addExpense(expense_name, Some(description), amount, currentTimestamp, expense_type)
+        expenseService.addExpense(expense_name, Some(description), amount, DateTime.now, expense_type)
         Ok(Json.toJson("Expense added successfully"))
       }
       catch {
@@ -73,7 +74,7 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
         val calendar = Calendar.getInstance
         val now = calendar.getTime
         val currentTimestamp = new Timestamp(now.getTime)
-        expenseService.updateExpense(id, Expense(0, expense_name, Some(description), amount, Some(currentTimestamp), null, user_id, expense_type_id))
+        expenseService.updateExpense(id, Expense(0, expense_name, Some(description), amount, Some(DateTime.now), null, user_id, expense_type_id))
         Ok("Expense updated successfully")
       }
       catch {

@@ -5,12 +5,13 @@ import java.sql.Timestamp
 import dao.ExpenseDAO
 import model.{Expense, ExpenseType, User}
 import javax.inject.{Inject, Singleton}
+import org.joda.time.DateTime
 
 import scala.concurrent.Future
 
 @Singleton
 class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseService {
-  def addExpense(expenseName: String, description: Option[String] = None, amount: Double, date: Timestamp, expense_type: String, user_id: Int = 1): Future[String] = {
+  def addExpense(expenseName: String, description: Option[String] = None, amount: Double, date: DateTime, expense_type: String, user_id: Int = 1): Future[String] = {
     expenseDAO.add(expenseName, description.getOrElse(""), amount, date, expense_type, user_id)
   }
 
@@ -22,8 +23,8 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
     expenseDAO.get(id)
   }
 
-  def listAllExpenses(userID: Int): Future[Seq[(Expense, ExpenseType, User)]] = {
-    expenseDAO.listAllExpenses(userID)
+  def listAllExpenses(userID: Int, etype: Option[String] = None, month: Option[String] = None): Future[Seq[(Expense, ExpenseType, User)]] = {
+    expenseDAO.listAllExpenses(userID, etype, month)
   }
 
   def updateExpense(id: Int, expense: Expense) : Future[String] = {
