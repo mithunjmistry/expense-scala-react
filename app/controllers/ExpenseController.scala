@@ -43,10 +43,11 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
       val user_id = (request.body \ "user_id").as[Int]
       val expense_type = (request.body \ "expenseType").as[String]
       val created_at_json = (request.body \ "date").as[String]
-      val date : Date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(created_at_json)
-      val currentTimestamp = new Timestamp(date.getTime)
+//      val date : Date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(created_at_json)
+//      val currentTimestamp = new Timestamp(date.getTime)
+      val date : DateTime = DateTime.parse(created_at_json)
       try{
-        expenseService.addExpense(expense_name, Some(description), amount, DateTime.now, expense_type)
+        expenseService.addExpense(expense_name, Some(description), amount, date, expense_type)
         Ok(Json.toJson("Expense added successfully"))
       }
       catch {
