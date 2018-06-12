@@ -66,6 +66,16 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
     }
   }
 
+  def getExpense(id: Int) = Action.async { implicit request => {
+      expenseService.getExpense(id) map { e =>
+        e match {
+          case Some(expense) => Ok(Json.toJson(expense))
+          case _ => BadRequest("Expense does not exist.")
+        }
+      }
+    }
+  }
+
   def updateExpense(id: Int) = Action(parse.tolerantFormUrlEncoded) { request => {
       try {
         val expense_name = request.body.get("expense_name").map(_.head).getOrElse("")

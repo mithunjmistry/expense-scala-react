@@ -13,6 +13,7 @@ DELETE  /api/delete/expense/:id     controllers.ExpenseController.deleteExpense(
 POST    /api/update/expense/:id     controllers.ExpenseController.updateExpense(id: Int)
 GET     /api/all/expensetypes       controllers.FilterController.allExpenseTypes
 GET     /api/filter/attributes      controllers.FilterController.filterAttributes
+GET     /api/get/expense/:id        controllers.ExpenseController.getExpense(id: Int)
 
 
 # Serve static assets under public directory
