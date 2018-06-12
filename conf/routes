@@ -7,7 +7,7 @@ GET     /                           controllers.FrontendController.index()
 
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
 GET     /api/summary                controllers.HomeController.appSummary
-GET     /api/all/expenses           controllers.ExpenseController.allExpenses(etype: Option[String], month: Option[String])
+GET     /api/all/expenses           controllers.ExpenseController.allExpenses(sortColumn: Option[String], sortDirection: Option[String], etype: Option[String], month: Option[String])
 POST    /api/add/expense            controllers.ExpenseController.addExpense
 DELETE  /api/delete/expense/:id     controllers.ExpenseController.deleteExpense(id: Int)
 POST    /api/update/expense/:id     controllers.ExpenseController.updateExpense(id: Int)

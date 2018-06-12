@@ -74,7 +74,7 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     db.run(expenses.filter(_.id === id).result.headOption)
   }
 
-  override def listAllExpenses(userID: Int, etype: Option[String], month: Option[String]): Future[Seq[(Expense, ExpenseType, User)]] = {
+  override def listAllExpenses(userID: Int, sorting: (String, String), etype: Option[String], month: Option[String]): Future[Seq[(Expense, ExpenseType, User)]] = {
 
     implicit val jodaDateTimeType =
     MappedColumnType.base[DateTime, Timestamp](
@@ -99,7 +99,21 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
       })
       u <- e.user
     } yield (e, et, u)
-    db.run(q.sortBy(_._1.created_at.desc).result)
+
+//    sorting match {
+//      case ("amount", "asc") => x._1.amount.asc
+//      case ("amount", "desc") => x._1.amount.desc
+//      case ("created_at", "asc") => x._1.created_at.asc
+//      case _ => x._1.created_at.desc
+//    }
+    db.run(q.sortBy(x => sorting match {
+          case ("amount", "asc") => x._1.amount.asc
+          case ("amount", "desc") => x._1.amount.desc
+          case ("created_at", "asc") => x._1.created_at.asc
+          case _ => x._1.created_at.desc
+    }
+    ).result)
+//    db.run(q.sortBy(_._1.created_at.desc).result)
   }
 
   override def update(id: Int, expense: Expense): Future[String] = {

@@ -24,10 +24,11 @@ import scala.language.implicitConversions
 @Singleton
 class ExpenseController @Inject()(cc: ControllerComponents, expenseService: ExpenseService) extends AbstractController(cc) {
 
-  def allExpenses(etype: Option[String] = None, month: Option[String] = None) = Action.async { implicit request => {
-    expenseService.listAllExpenses(1, etype, month) map { expenses =>
-        Ok(Json.toJson(expenses))
-      }
+  def allExpenses(sortColumn: Option[String], sortDirection: Option[String], etype: Option[String] = None, month: Option[String] = None) =
+    Action.async { implicit request => {
+      expenseService.listAllExpenses(1, (sortColumn.getOrElse("created_at"), sortDirection.getOrElse("desc")), etype, month) map { expenses =>
+          Ok(Json.toJson(expenses))
+        }
     }
   }
 
