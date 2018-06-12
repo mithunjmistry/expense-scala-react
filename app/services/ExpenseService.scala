@@ -14,6 +14,6 @@ trait ExpenseService {
   def deleteExpense(id: Int): Future[Int]
   def getExpense(id: Int): Future[Option[Expense]]
   def listAllExpenses(userID: Int, sorting: (String, String), etype: Option[String] = None, month: Option[String] = None): Future[Seq[(Expense, ExpenseType, User)]]
-  def updateExpense(id: Int, expense: Expense) : Future[String]
+  def updateExpense(id: Int, expenseName: String, description: Option[String] = None, amount: Double, date: DateTime, expense_type: String, user_id: Int = 1) : Future[String]
   def getAllDates : Vector[String]
 }

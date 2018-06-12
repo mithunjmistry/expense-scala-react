@@ -12,10 +12,7 @@ import model.Formatters._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import play.api.Logger
-import views.html.defaultpages.badRequest
 import java.util.Calendar
-import java.text.SimpleDateFormat
-import java.util.Date
 
 import org.joda.time.DateTime
 
@@ -76,17 +73,16 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
     }
   }
 
-  def updateExpense(id: Int) = Action(parse.tolerantFormUrlEncoded) { request => {
+  def updateExpense(id: Int) = Action(parse.json) { request => {
       try {
-        val expense_name = request.body.get("expense_name").map(_.head).getOrElse("")
-        val description : String = request.body.get("description").map(_.head).getOrElse("")
-        val amount = request.body.get("amount").map(_.head).getOrElse("").toDouble
-        val user_id = request.body.get("user_id").map(_.head).getOrElse("").toInt
-        val expense_type_id = request.body.get("expense_type_id").map(_.head).getOrElse("").toInt
-        val calendar = Calendar.getInstance
-        val now = calendar.getTime
-        val currentTimestamp = new Timestamp(now.getTime)
-        expenseService.updateExpense(id, Expense(0, expense_name, Some(description), amount, Some(DateTime.now), null, user_id, expense_type_id))
+        val expense_name = (request.body \ "expense_name").as[String]
+        val description = (request.body \ "description").as[String]
+        val amount = (request.body \ "amount").as[String].toDouble
+        val user_id = (request.body \ "user_id").as[Int]
+        val expense_type = (request.body \ "expenseType").as[String]
+        val created_at_json = (request.body \ "date").as[String]
+        val date : DateTime = DateTime.parse(created_at_json)
+        expenseService.updateExpense(id, expense_name, Some(description), amount, date, expense_type)
         Ok("Expense updated successfully")
       }
       catch {

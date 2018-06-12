@@ -116,8 +116,12 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
 //    db.run(q.sortBy(_._1.created_at.desc).result)
   }
 
-  override def update(id: Int, expense: Expense): Future[String] = {
-    db.run(expenses.filter(_.id === id).update(expense)).map(res => "Expense updated successfully")
+  override def update(id: Int, expenseName: String, description: String, amount: Double, date: DateTime, expense_type: String, user_id: Int): Future[String] = {
+    val q = for {
+      etid <- expenseType.findOrCreateExpenseTypeID(expense_type)
+      e <- expenses.filter(_.id === id).update(Expense(id, expenseName, Some(description), amount, Some(date), null, user_id, etid))
+    } yield ()
+    db.run(q).map(res => "Expense updated successfully")
       .recover{
         case ex: Exception => ex.getCause.getMessage
       }
