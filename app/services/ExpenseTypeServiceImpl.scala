@@ -20,7 +20,7 @@ class ExpenseTypeServiceImpl @Inject()(expenseTypeDAO: ExpenseTypeDAO) extends E
     expenseTypeDAO.get(id)
   }
 
-  def listAllExpenses: Future[Seq[ExpenseType]] = {
+  def listAllExpenseTypes: Future[Seq[String]] = {
     expenseTypeDAO.listAllExpenseTypes
   }
 

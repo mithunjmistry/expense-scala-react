@@ -5,6 +5,9 @@ import Pagination from "react-js-pagination";
 import {connect} from "react-redux";
 import {changeFilters} from "../actions/filter"
 import {ALL, DATE} from "../api/strings";
+import {deleteExpenseAPI, getAllExpensesAPI} from "../api/apiURLs";
+import axios from "../api/axiosInstance";
+import ExpenseRow from "../components/ExpenseRow";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -24,7 +27,35 @@ class Expenses extends React.Component{
       activePage: 1,
       sortBy: DATE,
       month: ALL,
-      type: ALL
+      type: ALL,
+      expenses: [],
+      totalItemsCount: 0
+  };
+
+  getExpensesList = (sortBy, month, type) => {
+
+    let params = {
+      sortColumn: sortBy === "date" ? "created_at" : "amount"
+    };
+
+    if(type !== "all"){
+      params = {...params, etype: type}
+    }
+    if(month !== "all"){
+      params = {...params, month}
+    }
+
+    axios.get(getAllExpensesAPI, {
+      params
+    }).then((response) => {
+      this.setState(() => ({
+        expenses: response.data,
+        totalItemsCount: response.data.length
+      }));
+    })
+      .catch((error) => {
+        console.log(error.response);
+      });
   };
 
   componentDidMount(){
@@ -34,10 +65,14 @@ class Expenses extends React.Component{
       month,
       type
     }));
+    this.getExpensesList(sortBy, month, type);
   }
 
   changeRoute = (routeURL) => {
-    this.props.history.push(routeURL);
+    this.props.history.push({
+      pathname: routeURL,
+      state: {expenseTypes: this.props.expenseTypeFilter}
+    });
   };
 
   handlePageChange = (pageNumber) => {
@@ -61,11 +96,11 @@ class Expenses extends React.Component{
       month,
       type
     }));
+    this.getExpensesList(sortBy, month, type);
   };
 
   handleSelectChange = (selectName, e) => {
     const value = e.target.value;
-    console.log(value);
     if(selectName === "sortBy"){
       this.setState(() => ({sortBy: value}));
     }
@@ -77,7 +112,44 @@ class Expenses extends React.Component{
     }
   };
 
+  deleteExpense = (id) => {
+
+    axios.delete(deleteExpenseAPI(id)).then((response) => {
+      this.setState((prevState) => ({
+        expenses: prevState.expenses.filter((value) => (
+          value[0].id != id
+        ))
+      }));
+    }).catch((error) => {
+      console.log(error.response);
+    });
+  };
+
   render(){
+
+    let items = [];
+    const {activePage, expenses} = this.state;
+    const end = (activePage*10) - 1;
+    const start = end - 9;
+    for (let i = start; i <= end; i++ ) {
+      if(i < expenses.length) {
+        items.push(
+          <ExpenseRow
+            key={i}
+            iden={expenses[i][0].id}
+            expense_name={expenses[i][0].expense_name}
+            expense_type_name={expenses[i][1].expense_type_name}
+            description={expenses[i][0].description}
+            created_at={expenses[i][0].created_at}
+            amount={expenses[i][0].amount}
+            deleteExpense={this.deleteExpense}
+            expenseTypes={this.props.expenseTypeFilter}
+          />
+          );
+      }else{
+        break;
+      }
+    }
 
     return (
       <div>
@@ -90,11 +162,11 @@ class Expenses extends React.Component{
                 </Col>
 
                 <Col lg={2} md={2} sm={4}>
-                  <SelectGroup options={["all", "06-2018", "05-2018"]} label={"month:"} value={this.state.month} onChange={(e) => this.handleSelectChange("filterMonth", e)} name={"filterDate"}/>
+                  <SelectGroup options={this.props.dateFilter} label={"month:"} value={this.state.month} onChange={(e) => this.handleSelectChange("filterMonth", e)} name={"filterDate"}/>
                 </Col>
 
                 <Col lg={2} md={2} sm={4}>
-                  <SelectGroup options={["all", "grocery", "general"]} label={"type:"} value={this.state.type} onChange={(e) => this.handleSelectChange("filterType", e)} name={"filterType"}/>
+                  <SelectGroup options={this.props.expenseTypeFilter} label={"type:"} value={this.state.type} onChange={(e) => this.handleSelectChange("filterType", e)} name={"filterType"}/>
                 </Col>
 
                 <Col lg={2} md={2} sm={12} xs={12}>
@@ -126,62 +198,13 @@ class Expenses extends React.Component{
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Rent</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>06-08-2018</td>
-                    <td>$290</td>
-                    <td>
-                      <Button bsSize="xsmall" className={"no-border"}>
-                        <Glyphicon glyph="pencil" />
-                      </Button>
-
-                      <Button bsSize="xsmall" className={"margin-left-five no-border"}>
-                        <Glyphicon glyph="remove" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>Rent</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>06-08-2018</td>
-                    <td>$290</td>
-                    <td>
-                      <Button bsSize="xsmall" className={"no-border"}>
-                        <Glyphicon glyph="pencil" />
-                      </Button>
-
-                      <Button bsSize="xsmall" className={"margin-left-five no-border"}>
-                        <Glyphicon glyph="remove" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>Rent</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>06-08-2018</td>
-                    <td>$290</td>
-                    <td>
-                      <Button bsSize="xsmall" className={"no-border"}>
-                        <Glyphicon glyph="pencil" />
-                      </Button>
-
-                      <Button bsSize="xsmall" className={"margin-left-five no-border"}>
-                        <Glyphicon glyph="remove" />
-                      </Button>
-                    </td>
-                  </tr>
+                    {items}
                   </tbody>
                 </Table>
               </Col>
             </Row>
 
+            {this.state.expenses.length > 0 &&
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
 
@@ -189,14 +212,14 @@ class Expenses extends React.Component{
                   <Pagination
                     activePage={this.state.activePage}
                     itemsCountPerPage={10}
-                    totalItemsCount={450}
-                    pageRangeDisplayed={5}
+                    totalItemsCount={this.state.totalItemsCount}
+                    pageRangeDisplayed={3}
                     hideFirstLastPages={true}
                     onChange={this.handlePageChange}
                   />
                 </div>
               </Col>
-            </Row>
+            </Row>}
           </Col>
         </Row>
 

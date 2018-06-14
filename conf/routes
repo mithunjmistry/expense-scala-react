@@ -3,15 +3,19 @@
 # ~~~~
 
 # Serve index page from public directory
-GET     /                           controllers.FrontendController.index()
+GET     /                                   controllers.FrontendController.index()
 
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
-GET     /api/summary                controllers.HomeController.appSummary
-GET     /api/all/expenses           controllers.ExpenseController.allExpenses
-POST    /api/add/expense            controllers.ExpenseController.addExpense
-DELETE  /api/delete/expense/:id     controllers.ExpenseController.deleteExpense(id: Int)
-POST    /api/update/expense/:id     controllers.ExpenseController.updateExpense(id: Int)
+GET     /api/summary                        controllers.HomeController.appSummary
+GET     /api/all/expenses                   controllers.ExpenseController.allExpenses(sortColumn: Option[String], sortDirection: Option[String], etype: Option[String], month: Option[String])
+POST    /api/add/expense                    controllers.ExpenseController.addExpense
+DELETE  /api/delete/expense/:id             controllers.ExpenseController.deleteExpense(id: Int)
+POST    /api/update/expense/:id             controllers.ExpenseController.updateExpense(id: Int)
+GET     /api/all/expensetypes               controllers.FilterController.allExpenseTypes
+GET     /api/filter/attributes              controllers.FilterController.filterAttributes
+GET     /api/get/expense/:id/:userID        controllers.ExpenseController.getExpense(id: Int, userID: Int)
+GET     /api/expense/statistics             controllers.FilterController.getStatistics(date: Option[String])
 
 
 # Serve static assets under public directory
-GET     /*file                      controllers.FrontendController.assetOrDefault(file)
+GET     /*file                              controllers.FrontendController.assetOrDefault(file)
