@@ -19,8 +19,8 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
     expenseDAO.delete(id)
   }
 
-  def getExpense(id: Int): Future[Option[Expense]] = {
-    expenseDAO.get(id)
+  def getExpense(id: Int, userID: Int): Future[Option[(Expense, ExpenseType, User)]] = {
+    expenseDAO.get(id, userID)
   }
 
   def listAllExpenses(userID: Int, sorting: (String, String), etype: Option[String] = None, month: Option[String] = None): Future[Seq[(Expense, ExpenseType, User)]] = {

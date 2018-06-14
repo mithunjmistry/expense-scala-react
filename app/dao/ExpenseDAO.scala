@@ -12,7 +12,7 @@ import scala.concurrent.Future
 trait ExpenseDAO {
   def add(expenseName: String, description: String, amount: Double, date: DateTime, expense_type: String, user_id: Int): Future[String]
   def delete(id: Int): Future[Int]
-  def get(id: Int): Future[Option[Expense]]
+  def get(id: Int, userID: Int): Future[Option[(Expense, ExpenseType, User)]]
   def listAllExpenses(userID: Int, sorting: (String, String), etype: Option[String], month: Option[String]): Future[Seq[(Expense, ExpenseType, User)]]
   def update(id: Int, expenseName: String, description: String, amount: Double, date: DateTime, expense_type: String, user_id: Int) : Future[String]
   def getAllDates : Vector[String]

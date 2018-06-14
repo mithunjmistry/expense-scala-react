@@ -64,7 +64,7 @@ class ExpenseController @Inject()(cc: ControllerComponents, expenseService: Expe
   }
 
   def getExpense(id: Int) = Action.async { implicit request => {
-      expenseService.getExpense(id) map { e =>
+      expenseService.getExpense(id, 1) map { e =>
         e match {
           case Some(expense) => Ok(Json.toJson(expense))
           case _ => BadRequest("Expense does not exist.")

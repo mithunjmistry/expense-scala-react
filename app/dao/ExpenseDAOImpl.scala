@@ -70,8 +70,13 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
     db.run(expenses.filter(_.id === id).delete)
   }
 
-  override def get(id: Int): Future[Option[Expense]] = {
-    db.run(expenses.filter(_.id === id).result.headOption)
+  override def get(id: Int, userID: Int): Future[Option[(Expense, ExpenseType, User)]] = {
+    val q = for {
+      e <- expenses.filter(_.id === id)
+      et <- e.expense_type
+      u <- e.user.filter(_.id === userID)
+    } yield (e, et, u)
+    db.run(q.result.headOption)
   }
 
   override def listAllExpenses(userID: Int, sorting: (String, String), etype: Option[String], month: Option[String]): Future[Seq[(Expense, ExpenseType, User)]] = {
