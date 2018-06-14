@@ -32,12 +32,17 @@ class ExpenseRow extends React.Component{
 
   render(){
 
+    let {description} = this.props;
+    if(description.length > 25){
+      description = description.substr(0, 25) + " ...";
+    }
+
     return (
       <tr>
         <td>{this.props.iden}</td>
         <td>{this.props.expense_name}</td>
         <td>{this.props.expense_type_name}</td>
-        <td>{this.props.description}</td>
+        <td>{description}</td>
         <td>{this.props.created_at}</td>
         <td>${this.props.amount.toFixed(2)}</td>
         <td>
