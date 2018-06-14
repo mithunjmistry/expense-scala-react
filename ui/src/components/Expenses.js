@@ -1,10 +1,13 @@
 import React from 'react';
-import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table, Form } from 'react-bootstrap';
+import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table, Form, Overlay, Popover } from 'react-bootstrap';
 import {withRouter} from "react-router-dom";
 import Pagination from "react-js-pagination";
 import {connect} from "react-redux";
 import {changeFilters} from "../actions/filter"
 import {ALL, DATE} from "../api/strings";
+import {deleteExpenseAPI, getAllExpensesAPI} from "../api/apiURLs";
+import axios from "../api/axiosInstance";
+import ExpenseRow from "../components/ExpenseRow";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -24,7 +27,31 @@ class Expenses extends React.Component{
       activePage: 1,
       sortBy: DATE,
       month: ALL,
-      type: ALL
+      type: ALL,
+      expenses: []
+  };
+
+  getExpensesList = (sortBy, month, type) => {
+
+    let params = {
+      sortColumn: sortBy === "date" ? "created_at" : "amount"
+    };
+
+    if(type !== "all"){
+      params = {...params, etype: type}
+    }
+    if(month !== "all"){
+      params = {...params, month}
+    }
+
+    axios.get(getAllExpensesAPI, {
+      params
+    }).then((response) => {
+      this.setState(() => ({expenses: response.data}));
+    })
+      .catch((error) => {
+        console.log(error.response);
+      });
   };
 
   componentDidMount(){
@@ -34,6 +61,7 @@ class Expenses extends React.Component{
       month,
       type
     }));
+    this.getExpensesList(sortBy, month, type);
   }
 
   changeRoute = (routeURL) => {
@@ -61,6 +89,7 @@ class Expenses extends React.Component{
       month,
       type
     }));
+    this.getExpensesList(sortBy, month, type);
   };
 
   handleSelectChange = (selectName, e) => {
@@ -75,6 +104,20 @@ class Expenses extends React.Component{
     else if(selectName === "filterType"){
       this.setState(() => ({type: value}));
     }
+  };
+
+  deleteExpense = (id) => {
+    this.setState((prevState) => ({
+      expenses: prevState.expenses.filter((value) => (
+        value[0].id != id
+      ))
+    }));
+
+    axios.delete(deleteExpenseAPI(id)).then((response) => {
+      console.log(response.data);
+    }).catch((error) => {
+      console.log(error.response);
+    });
   };
 
   render(){
@@ -126,57 +169,18 @@ class Expenses extends React.Component{
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Rent</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>06-08-2018</td>
-                    <td>$290</td>
-                    <td>
-                      <Button bsSize="xsmall" className={"no-border"}>
-                        <Glyphicon glyph="pencil" />
-                      </Button>
-
-                      <Button bsSize="xsmall" className={"margin-left-five no-border"}>
-                        <Glyphicon glyph="remove" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>Rent</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>06-08-2018</td>
-                    <td>$290</td>
-                    <td>
-                      <Button bsSize="xsmall" className={"no-border"}>
-                        <Glyphicon glyph="pencil" />
-                      </Button>
-
-                      <Button bsSize="xsmall" className={"margin-left-five no-border"}>
-                        <Glyphicon glyph="remove" />
-                      </Button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>Rent</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>06-08-2018</td>
-                    <td>$290</td>
-                    <td>
-                      <Button bsSize="xsmall" className={"no-border"}>
-                        <Glyphicon glyph="pencil" />
-                      </Button>
-
-                      <Button bsSize="xsmall" className={"margin-left-five no-border"}>
-                        <Glyphicon glyph="remove" />
-                      </Button>
-                    </td>
-                  </tr>
+                  {this.state.expenses.map((value, key) => (
+                    <ExpenseRow
+                      key={key}
+                      iden={value[0].id}
+                      expense_name={value[0].expense_name}
+                      expense_type_name={value[1].expense_type_name}
+                      description={value[0].description}
+                      created_at={value[0].created_at}
+                      amount={value[0].amount}
+                      deleteExpense={this.deleteExpense}
+                    />
+                  ))}
                   </tbody>
                 </Table>
               </Col>
