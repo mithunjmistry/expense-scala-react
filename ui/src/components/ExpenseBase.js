@@ -211,7 +211,13 @@ class ExpenseBase extends React.Component {
                   <FormGroup>
                     <ControlLabel>expense type</ControlLabel>
                     <InputGroup>
-                      <FormControl componentClass={"select"} name={"expenseType"} value={this.state.expenseType} onChange={(e) => this.onFormControlChange(e, "expenseType")}>
+                      <FormControl
+                        componentClass={"select"}
+                        name={"expenseType"}
+                        value={this.state.expenseType}
+                        onChange={(e) => this.onFormControlChange(e, "expenseType")}
+                        disabled={this.state.otherExpenseType}
+                      >
                         {this.state.expenseTypes.map((v) => (
                           <option key={v}>{v}</option>
                         ))}
