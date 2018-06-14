@@ -1,5 +1,5 @@
 import React from 'react';
-import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table, Form, Overlay, Popover } from 'react-bootstrap';
+import { Glyphicon, Col, Row, Button, FormGroup, FormControl, ControlLabel, Table, Form } from 'react-bootstrap';
 import {withRouter} from "react-router-dom";
 import Pagination from "react-js-pagination";
 import {connect} from "react-redux";
@@ -69,7 +69,10 @@ class Expenses extends React.Component{
   }
 
   changeRoute = (routeURL) => {
-    this.props.history.push(routeURL);
+    this.props.history.push({
+      pathname: routeURL,
+      state: {expenseTypes: this.props.expenseTypeFilter}
+    });
   };
 
   handlePageChange = (pageNumber) => {
@@ -110,14 +113,13 @@ class Expenses extends React.Component{
   };
 
   deleteExpense = (id) => {
-    this.setState((prevState) => ({
-      expenses: prevState.expenses.filter((value) => (
-        value[0].id != id
-      ))
-    }));
 
     axios.delete(deleteExpenseAPI(id)).then((response) => {
-      console.log(response.data);
+      this.setState((prevState) => ({
+        expenses: prevState.expenses.filter((value) => (
+          value[0].id != id
+        ))
+      }));
     }).catch((error) => {
       console.log(error.response);
     });
@@ -141,6 +143,7 @@ class Expenses extends React.Component{
             created_at={expenses[i][0].created_at}
             amount={expenses[i][0].amount}
             deleteExpense={this.deleteExpense}
+            expenseTypes={this.props.expenseTypeFilter}
           />
           );
       }else{

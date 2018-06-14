@@ -6,7 +6,8 @@ import DatePicker from 'react-datepicker';
 import Moment from 'moment-timezone';
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import axios from "../api/axiosInstance";
-import {addExpenseAPI, allExpenseTypesAPI} from "../api/apiURLs";
+import {addExpenseAPI, deleteExpenseAPI, getExpenseAPI} from "../api/apiURLs";
+import BaseModal from "../components/BaseModal";
 
 const FieldGroup = ({id, label, componentType, ...props}) => (
   <FormGroup controlId={id}>
@@ -20,32 +21,48 @@ class ExpenseBase extends React.Component {
   state = {
       title: "Expense",
       date: Moment().tz('America/Los_Angeles'),
-      expenseTypes: ["general"],
+      expenseTypes: [],
       otherExpenseType: false,
       expenseTypeGlyph: true,
       error: false,
-      saveBtn: false
+      saveBtn: false,
+      expenseName: "",
+      description: "",
+      amount: "",
+      expenseType: "general",
+      expenseID: null,
+      showModalState: false
   };
 
-  getExpenseTypes = () => {
-    axios.get(allExpenseTypesAPI).then((response) => {
-      const expenseTypes = response.data;
-      this.setState(() => ({expenseTypes}));
-    }).catch((error) => {
+  getExpense = (id, userID) => {
+    axios.get(getExpenseAPI(id, userID))
+    .then((response) => {
+      const data = response.data;
+      const date = Moment(data[0].created_at, "MM/DD/YYYY");
+      this.setState(() => ({
+        expenseName: data[0].expense_name,
+        description: data[0].description,
+        amount: data[0].amount,
+        expenseType: data[1].expense_type_name,
+        expenseID: data[0].id,
+        date
+      }));
+    })
+    .catch((error) => {
       console.log(error.response);
-    });
+    })
   };
 
   componentDidMount(){
+    let expenseTypes = this.props.history.location.state.expenseTypes.filter((value) => value !== "all");
     let action = this.props.match.params.eaction;
     if(action === "add"){
-      this.setState(() => ({title: ADD_EXPENSE}));
-      this.getExpenseTypes();
+      this.setState(() => ({title: ADD_EXPENSE, expenseTypes}));
     }
     else if(action === "edit"){
       let expenseID = this.props.match.params.expenseID;
-      this.setState(() => ({title: EDIT_EXPENSE}));
-      this.getExpenseTypes();
+      this.setState(() => ({title: EDIT_EXPENSE, expenseTypes}));
+      this.getExpense(expenseID, 1);
     }
     else{
       this.props.history.push("/");
@@ -101,6 +118,39 @@ class ExpenseBase extends React.Component {
       }
   };
 
+  onFormControlChange = (e, inputName) => {
+    const value = e.target.value;
+    if(inputName === "expenseName"){
+      this.setState(() => ({expenseName: value}));
+    }
+    else if(inputName === "description"){
+      this.setState(() => ({description: value}));
+    }
+    else if(inputName === "amount"){
+      this.setState(() => ({amount: value}));
+    }
+    else if(inputName === "expenseType"){
+      this.setState(() => ({expenseType: value}));
+    }
+  };
+
+  handleModalClose = () => {
+    this.setState({ showModalState: false });
+  };
+
+  handleModalShow = () => {
+    this.setState({ showModalState: true });
+  };
+
+  deleteExpense = () => {
+    this.setState(() => ({showModalState: false}));
+    axios.delete(deleteExpenseAPI(this.state.expenseID)).then((response) => {
+      this.props.history.push("/");
+    }).catch((error) => {
+      console.log(error.response);
+    });
+  };
+
   render() {
 
     const {title, error} = this.state;
@@ -119,6 +169,8 @@ class ExpenseBase extends React.Component {
                 label={"expense name"}
                 componentType={"input"}
                 name={"expenseName"}
+                value={this.state.expenseName}
+                onChange={(e) => this.onFormControlChange(e, "expenseName")}
               />
 
               <FieldGroup
@@ -126,6 +178,8 @@ class ExpenseBase extends React.Component {
                 label={"description"}
                 componentType={"textarea"}
                 name={"description"}
+                value={this.state.description}
+                onChange={(e) => this.onFormControlChange(e, "description")}
               />
 
               <FieldGroup
@@ -136,6 +190,8 @@ class ExpenseBase extends React.Component {
                 type="number"
                 step="0.01"
                 min={0}
+                value={this.state.amount}
+                onChange={(e) => this.onFormControlChange(e, "amount")}
               />
 
               <Row>
@@ -154,7 +210,7 @@ class ExpenseBase extends React.Component {
                   <FormGroup>
                     <ControlLabel>expense type</ControlLabel>
                     <InputGroup>
-                      <FormControl componentClass={"select"} name={"expenseType"}>
+                      <FormControl componentClass={"select"} name={"expenseType"} value={this.state.expenseType} onChange={(e) => this.onFormControlChange(e, "expenseType")}>
                         {this.state.expenseTypes.map((v) => (
                           <option key={v}>{v}</option>
                         ))}
@@ -180,10 +236,21 @@ class ExpenseBase extends React.Component {
                 {title === EDIT_EXPENSE &&
                 <Row className={"margin-bottom-one"}>
                   <Col lg={12} md={12}>
-                    <Button bsStyle={"link"} className={"red-color"}>
+                    <Button bsStyle={"link"} className={"red-color"} onClick={this.handleModalShow}>
                       <Glyphicon glyph={"minus"}/> delete expense
                     </Button>
                   </Col>
+
+                  <BaseModal
+                    showModalState={this.state.showModalState}
+                    modalTitle={"confirm delete"}
+                    handleModalClose={this.handleModalClose}
+                    buttonStyle={"danger"}
+                    buttonText={"delete"}
+                    onConfirmAction={this.deleteExpense}
+                  >
+                    Are you sure you want to delete the expense?
+                  </BaseModal>
                 </Row>}
 
               </Row>

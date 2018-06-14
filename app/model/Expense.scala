@@ -21,7 +21,7 @@ object Formatters {
   }
 
   import play.api.libs.json.JodaWrites
-  implicit val dateTimeWriter: Writes[DateTime] = JodaWrites.jodaDateWrites("dd-MM-yyyy")
+  implicit val dateTimeWriter: Writes[DateTime] = JodaWrites.jodaDateWrites("MM-dd-yyyy")
   import play.api.libs.json.JodaReads
   implicit val dateTimeJsReader = JodaReads.jodaDateReads("yyyyMMddHHmmss")
 

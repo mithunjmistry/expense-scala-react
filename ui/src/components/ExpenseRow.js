@@ -11,7 +11,10 @@ class ExpenseRow extends React.Component{
   };
 
   changeRoute = (routeURL) => {
-    this.props.history.push(routeURL);
+    this.props.history.push({
+      pathname: routeURL,
+      state: {expenseTypes: this.props.expenseTypes}
+    });
   };
 
   handleModalClose = () => {

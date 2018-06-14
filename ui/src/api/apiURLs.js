@@ -11,3 +11,7 @@ export const deleteExpenseAPI = (id) => (
 );
 
 export const getFilterAttributesAPI = "api/filter/attributes";
+
+export const getExpenseAPI = (id, userID) => (
+  `api/get/expense/${id}/${userID}`
+);
