@@ -34,4 +34,8 @@ class ExpenseServiceImpl @Inject()(expenseDAO: ExpenseDAO) extends ExpenseServic
   def getAllDates : Vector[String] = {
     expenseDAO.getAllDates
   }
+
+  def getExpenseStatistics(date: Option[String]) : Future[(Option[Double], Option[Double])] = {
+    expenseDAO.getExpenseStatistics(date)
+  }
 }

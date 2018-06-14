@@ -19,3 +19,5 @@ export const getExpenseAPI = (id, userID) => (
 export const updateExpenseAPI = (id) => (
   `api/update/expense/${id}`
 );
+
+export const getStatisticsAPI = "/api/expense/statistics";

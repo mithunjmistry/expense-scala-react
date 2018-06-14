@@ -12,6 +12,7 @@ import java.sql.Timestamp
 
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.UTC
+import play.Logger
 
 import scala.concurrent.duration._
 
@@ -135,5 +136,29 @@ class ExpenseDAOImpl @Inject()(dbConfigProvider: DatabaseConfigProvider, userDAO
   override def getAllDates : Vector[String] = {
     val action = sql""" select distinct(DATE_FORMAT(created_at,'%m-%Y')) from expense order by created_at DESC """.as[String]
     Await.result(db.run(action), 2 seconds)
+  }
+
+  def getExpenseStatistics(date: Option[String]) : Future[(Option[Double], Option[Double])] = {
+    implicit val jodaDateTimeType =
+      MappedColumnType.base[DateTime, Timestamp](
+        dt => new Timestamp(dt.getMillis),
+        ts => new DateTime(ts.getTime, UTC)
+      )
+
+    val e = expenses.filter(r => date match {
+      case Some(d) => {
+        val monthYear : Array[String] = d.split("-")
+        val startDate = new DateTime(monthYear(1).toInt, monthYear(0).toInt, 1, 0, 0, 0, 0)
+        val endDate = startDate.plusMonths(1)
+        r.created_at >= startDate && r.created_at < endDate
+      }
+      case _ => r.created_at === r.created_at
+    }).map(_.amount)
+
+    val m = for {
+      em <- e.max.result.map(_.headOption)
+      es <- e.sum.result.map(_.headOption)
+    } yield (em, es)
+    db.run(m)
   }
 }

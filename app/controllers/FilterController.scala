@@ -57,4 +57,14 @@ class FilterController @Inject()(cc: ControllerComponents, expenseTypeService: E
 //    ))
     }
   }
+
+  def getStatistics(date: Option[String]) = Action.async { implicit request => {
+      expenseService.getExpenseStatistics(date).map(s => s match
+      {
+        case (Some(m), Some(t)) => Ok(Json.toJson((m, t)))
+        case _ => BadRequest("No expenses available")
+      }
+      )
+    }
+  }
 }
