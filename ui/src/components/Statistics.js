@@ -57,15 +57,15 @@ class Statistics extends React.Component {
     return (
       <div>
         <Row>
-          <Col lg={12} md={12}>
+          <Col lg={12} md={12} smHidden xsHidden>
             <h4 className={"text-center"}>Statistics</h4>
           </Col>
 
-          <Col lg={12} md={12}>
+          <Col lg={12} md={12} sm={12} xs={12}>
             <StatisticsPanel heading={"Total"} stat={this.state.total}/>
           </Col>
 
-          <Col lg={12} md={12}>
+          <Col lg={12} md={12} sm={12} xs={12}>
             <StatisticsPanel heading={"Maximum Purchase"} stat={this.state.maximum}/>
           </Col>
         </Row>

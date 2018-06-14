@@ -29,6 +29,11 @@ body {
 }
 
 .add-expense-btn{
+  margin-top: 0;
+  margin-bottom: 1%;
+}
+
+.view-statistics-btn{
   margin-top: 20px;
   margin-bottom: 1%;
 }
@@ -169,5 +174,11 @@ body {
 
 .loader-top{
   margin-top: 8% !important;
+}
+
+@media (min-width:992px) {
+  .add-expense-btn{
+    margin-top: 20px !important;
+  }
 }
 

@@ -10,6 +10,8 @@ import axios from "../api/axiosInstance";
 import ExpenseRow from "../components/ExpenseRow";
 import InformationPanel from "../components/InformationPanel";
 import ExpenseTable from "../components/ExpenseTable";
+import BaseModal from "./BaseModal";
+import Statistics from "../components/Statistics";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -32,7 +34,8 @@ class Expenses extends React.Component{
       type: ALL,
       expenses: [],
       totalItemsCount: 0,
-      loading: true
+      loading: true,
+      showModalState: false
   };
 
   getExpensesList = (sortBy, month, type) => {
@@ -132,6 +135,14 @@ class Expenses extends React.Component{
     });
   };
 
+  handleModalClose = () => {
+    this.setState({ showModalState: false });
+  };
+
+  handleModalShow = () => {
+    this.setState({ showModalState: true });
+  };
+
   render(){
 
     const {activePage, expenses} = this.state;
@@ -182,6 +193,24 @@ class Expenses extends React.Component{
                 </Col>
               </Row>
             </Form>
+
+            {expenses.length > 0 &&
+              <Row>
+              <Col lgHidden mdHidden xs={12} sm={12}>
+                <Button bsSize="small" bsStyle={"link"} className={"view-statistics-btn"} onClick={this.handleModalShow}>
+                  <Glyphicon glyph={"stats"}/> view statistics
+                </Button>
+              </Col>
+
+              <BaseModal
+                modalTitle={"Statistics"}
+                handleModalClose={this.handleModalClose}
+                showModalState={this.state.showModalState}
+              >
+                <Statistics/>
+              </BaseModal>
+            </Row>
+            }
 
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>

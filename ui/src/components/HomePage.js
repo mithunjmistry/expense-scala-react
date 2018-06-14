@@ -42,7 +42,7 @@ export default class HomePage extends React.Component{
             <Expenses expenseTypeFilter={this.state.expenseFilterMenu} dateFilter={this.state.monthFilterMenu}/>
           </Col>
 
-          <Col lg={2} md={2} xsHidden mdHidden>
+          <Col lg={2} md={2} xsHidden>
             <Statistics/>
           </Col>
         </Row>
