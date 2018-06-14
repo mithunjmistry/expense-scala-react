@@ -1,24 +1,30 @@
 import React from 'react';
-import { Glyphicon, Button, Overlay, Popover } from 'react-bootstrap';
+import { Glyphicon, Button } from 'react-bootstrap';
 import {withRouter} from "react-router-dom";
+import BaseModal from "../components/BaseModal";
 
 
 class ExpenseRow extends React.Component{
 
   state = {
-    showRemoveConfirmation: false
+    showModalState: false
   };
 
   changeRoute = (routeURL) => {
     this.props.history.push(routeURL);
   };
 
-  handleRemoveClick = e => {
-    this.setState({ target: e.target, showRemoveConfirmation: !this.state.showRemoveConfirmation });
+  handleModalClose = () => {
+    this.setState({ showModalState: false });
   };
 
-  handleConfirmationCancel = () => {
-    this.setState({showRemoveConfirmation: false})
+  handleModalShow = () => {
+    this.setState({ showModalState: true });
+  };
+
+  deleteExpense = () => {
+    this.setState(() => ({showModalState: false}));
+    this.props.deleteExpense(this.props.iden);
   };
 
   render(){
@@ -36,23 +42,20 @@ class ExpenseRow extends React.Component{
             <Glyphicon glyph="pencil" />
           </Button>
 
-          <Button bsSize="xsmall" className={"margin-left-five no-border"} onClick={() => this.props.deleteExpense(this.props.iden)}>
+          <Button bsSize="xsmall" className={"margin-left-five no-border"} onClick={this.handleModalShow}>
             <Glyphicon glyph="remove" />
           </Button>
 
-          <Overlay
-            show={this.state.showRemoveConfirmation}
-            target={this.state.target}
-            placement="top"
-            container={this}
+          <BaseModal
+            showModalState={this.state.showModalState}
+            modalTitle={"confirm delete"}
+            handleModalClose={this.handleModalClose}
+            buttonStyle={"danger"}
+            buttonText={"delete"}
+            onConfirmAction={this.deleteExpense}
           >
-            <Popover id="popover-contained" title="Are you sure?">
-                <span>
-                    <Button className={"btn-sm"} bsStyle={"danger"} onClick={() => this.props.deleteExpense(this.props.iden)}>Yes</Button>
-                    <Button className={"btn-sm"} bsStyle={"link"} onClick={this.handleConfirmationCancel}>Cancel</Button>
-                </span>
-            </Popover>
-          </Overlay>
+            Are you sure you want to delete the expense?
+          </BaseModal>
         </td>
       </tr>
     )

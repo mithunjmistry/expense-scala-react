@@ -9,8 +9,8 @@ export default class HomePage extends React.Component{
 
   state = {
       message: false,
-      expenseFilterMenu: ["all"],
-      monthFilterMenu: ["all"]
+      expenseFilterMenu: [],
+      monthFilterMenu: []
   };
 
   handleButtonClick = () => {
@@ -23,8 +23,8 @@ export default class HomePage extends React.Component{
       const dates = data["dates"];
       const expenseTypes = data["expenseTypes"];
       this.setState((prevState) => ({
-        expenseFilterMenu: prevState.expenseFilterMenu.concat(expenseTypes),
-        monthFilterMenu: prevState.monthFilterMenu.concat(dates)
+        expenseFilterMenu: ["all"].concat(expenseTypes),
+        monthFilterMenu: ["all"].concat(dates)
       }));
     }).catch((error) => {
       console.log(error.response);
