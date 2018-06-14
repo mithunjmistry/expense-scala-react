@@ -15,3 +15,7 @@ export const getFilterAttributesAPI = "api/filter/attributes";
 export const getExpenseAPI = (id, userID) => (
   `api/get/expense/${id}/${userID}`
 );
+
+export const updateExpenseAPI = (id) => (
+  `api/update/expense/${id}`
+);

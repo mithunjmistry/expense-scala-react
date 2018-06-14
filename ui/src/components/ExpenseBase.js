@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import Moment from 'moment-timezone';
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import axios from "../api/axiosInstance";
-import {addExpenseAPI, deleteExpenseAPI, getExpenseAPI} from "../api/apiURLs";
+import {addExpenseAPI, deleteExpenseAPI, getExpenseAPI, updateExpenseAPI} from "../api/apiURLs";
 import BaseModal from "../components/BaseModal";
 
 const FieldGroup = ({id, label, componentType, ...props}) => (
@@ -42,7 +42,7 @@ class ExpenseBase extends React.Component {
       this.setState(() => ({
         expenseName: data[0].expense_name,
         description: data[0].description,
-        amount: data[0].amount,
+        amount: data[0].amount.toFixed(2),
         expenseType: data[1].expense_type_name,
         expenseID: data[0].id,
         date
@@ -103,7 +103,8 @@ class ExpenseBase extends React.Component {
           date
         };
         const headers = {"Content-Type": "application/json"};
-        axios.post(addExpenseAPI,data, {headers: {...headers}})
+        const api = this.state.title === ADD_EXPENSE ? addExpenseAPI : updateExpenseAPI(this.state.expenseID);
+        axios.post(api,data, {headers: {...headers}})
           .then((response) => {
             console.log(response.data);
             this.props.history.push("/");

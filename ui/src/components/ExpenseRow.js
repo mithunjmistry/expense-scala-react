@@ -39,7 +39,7 @@ class ExpenseRow extends React.Component{
         <td>{this.props.expense_type_name}</td>
         <td>{this.props.description}</td>
         <td>{this.props.created_at}</td>
-        <td>{this.props.amount}</td>
+        <td>${this.props.amount.toFixed(2)}</td>
         <td>
           <Button bsSize="xsmall" className={"no-border"} onClick={() => this.changeRoute(`/expense/edit/${this.props.iden}`)}>
             <Glyphicon glyph="pencil" />
