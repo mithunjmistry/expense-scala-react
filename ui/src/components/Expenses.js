@@ -9,6 +9,7 @@ import {deleteExpenseAPI, getAllExpensesAPI} from "../api/apiURLs";
 import axios from "../api/axiosInstance";
 import ExpenseRow from "../components/ExpenseRow";
 import InformationPanel from "../components/InformationPanel";
+import ExpenseTable from "../components/ExpenseTable";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -30,7 +31,8 @@ class Expenses extends React.Component{
       month: ALL,
       type: ALL,
       expenses: [],
-      totalItemsCount: 0
+      totalItemsCount: 0,
+      loading: true
   };
 
   getExpensesList = (sortBy, month, type) => {
@@ -51,11 +53,15 @@ class Expenses extends React.Component{
     }).then((response) => {
       this.setState(() => ({
         expenses: response.data,
-        totalItemsCount: response.data.length
+        totalItemsCount: response.data.length,
+        loading: false
       }));
     })
       .catch((error) => {
         console.log(error.response);
+        this.setState(() => ({
+          loading: false
+        }));
       });
   };
 
@@ -185,27 +191,8 @@ class Expenses extends React.Component{
               </Col>
             </Row>
 
-            {expenses.length > 0 ?
-              <Row>
-              <Col lg={12} md={12} xs={12} sm={12}>
-                <Table responsive bordered hover>
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>expense name</th>
-                    <th>expense type</th>
-                    <th>description</th>
-                    <th>date</th>
-                    <th>amount</th>
-                    <th>action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    {items}
-                  </tbody>
-                </Table>
-              </Col>
-            </Row>
+            {(expenses.length > 0 || this.state.loading) ?
+              <ExpenseTable expenses={items}/>
               :
               <Row>
                 <Col lg={12} md={12} xs={12} sm={12}>

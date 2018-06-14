@@ -24,7 +24,7 @@ const LoadingHOC = (loadingProp) => (WrappedComponent) => {
         loadingTime: ((this.endTimer - this.startTimer)/1000).toFixed(2),
       };
 
-      return isEmpty(this.props[loadingProp]) ? <div className="loader" /> : <WrappedComponent {...this.props} {...myProps}/>;
+      return isEmpty(this.props[loadingProp]) ? <div className="loader loader-top" /> : <WrappedComponent {...this.props} {...myProps}/>;
     }
   }
 };

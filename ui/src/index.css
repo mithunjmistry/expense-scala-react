@@ -156,6 +156,18 @@ body {
 .loader:after {
   width: 2.28571429rem;
   height: 2.28571429rem;
-  margin: 0em;
+  margin: 0;
+}
+
+.light-silver{
+  color: #727272 !important;
+}
+
+.padding-bottom-ten{
+  padding-bottom: 10px;
+}
+
+.loader-top{
+  margin-top: 8% !important;
 }
 
