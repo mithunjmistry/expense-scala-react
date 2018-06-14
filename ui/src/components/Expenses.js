@@ -94,7 +94,6 @@ class Expenses extends React.Component{
 
   handleSelectChange = (selectName, e) => {
     const value = e.target.value;
-    console.log(value);
     if(selectName === "sortBy"){
       this.setState(() => ({sortBy: value}));
     }
@@ -133,11 +132,11 @@ class Expenses extends React.Component{
                 </Col>
 
                 <Col lg={2} md={2} sm={4}>
-                  <SelectGroup options={["all", "06-2018", "05-2018"]} label={"month:"} value={this.state.month} onChange={(e) => this.handleSelectChange("filterMonth", e)} name={"filterDate"}/>
+                  <SelectGroup options={this.props.dateFilter} label={"month:"} value={this.state.month} onChange={(e) => this.handleSelectChange("filterMonth", e)} name={"filterDate"}/>
                 </Col>
 
                 <Col lg={2} md={2} sm={4}>
-                  <SelectGroup options={["all", "grocery", "general"]} label={"type:"} value={this.state.type} onChange={(e) => this.handleSelectChange("filterType", e)} name={"filterType"}/>
+                  <SelectGroup options={this.props.expenseTypeFilter} label={"type:"} value={this.state.type} onChange={(e) => this.handleSelectChange("filterType", e)} name={"filterType"}/>
                 </Col>
 
                 <Col lg={2} md={2} sm={12} xs={12}>

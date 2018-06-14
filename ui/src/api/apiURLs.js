@@ -9,3 +9,5 @@ export const getAllExpensesAPI = "api/all/expenses";
 export const deleteExpenseAPI = (id) => (
   `api/delete/expense/${id}`
 );
+
+export const getFilterAttributesAPI = "api/filter/attributes";
