@@ -28,7 +28,8 @@ class Expenses extends React.Component{
       sortBy: DATE,
       month: ALL,
       type: ALL,
-      expenses: []
+      expenses: [],
+      totalItemsCount: 0
   };
 
   getExpensesList = (sortBy, month, type) => {
@@ -47,7 +48,10 @@ class Expenses extends React.Component{
     axios.get(getAllExpensesAPI, {
       params
     }).then((response) => {
-      this.setState(() => ({expenses: response.data}));
+      this.setState(() => ({
+        expenses: response.data,
+        totalItemsCount: response.data.length
+      }));
     })
       .catch((error) => {
         console.log(error.response);
@@ -121,6 +125,29 @@ class Expenses extends React.Component{
 
   render(){
 
+    let items = [];
+    const {activePage, expenses} = this.state;
+    const end = (activePage*10) - 1;
+    const start = end - 9;
+    for (let i = start; i <= end; i++ ) {
+      if(i < expenses.length) {
+        items.push(
+          <ExpenseRow
+            key={i}
+            iden={expenses[i][0].id}
+            expense_name={expenses[i][0].expense_name}
+            expense_type_name={expenses[i][1].expense_type_name}
+            description={expenses[i][0].description}
+            created_at={expenses[i][0].created_at}
+            amount={expenses[i][0].amount}
+            deleteExpense={this.deleteExpense}
+          />
+          );
+      }else{
+        break;
+      }
+    }
+
     return (
       <div>
         <Row>
@@ -168,23 +195,13 @@ class Expenses extends React.Component{
                   </tr>
                   </thead>
                   <tbody>
-                  {this.state.expenses.map((value, key) => (
-                    <ExpenseRow
-                      key={key}
-                      iden={value[0].id}
-                      expense_name={value[0].expense_name}
-                      expense_type_name={value[1].expense_type_name}
-                      description={value[0].description}
-                      created_at={value[0].created_at}
-                      amount={value[0].amount}
-                      deleteExpense={this.deleteExpense}
-                    />
-                  ))}
+                    {items}
                   </tbody>
                 </Table>
               </Col>
             </Row>
 
+            {this.state.expenses.length > 0 &&
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
 
@@ -192,14 +209,14 @@ class Expenses extends React.Component{
                   <Pagination
                     activePage={this.state.activePage}
                     itemsCountPerPage={10}
-                    totalItemsCount={450}
-                    pageRangeDisplayed={5}
+                    totalItemsCount={this.state.totalItemsCount}
+                    pageRangeDisplayed={3}
                     hideFirstLastPages={true}
                     onChange={this.handlePageChange}
                   />
                 </div>
               </Col>
-            </Row>
+            </Row>}
           </Col>
         </Row>
 
