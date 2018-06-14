@@ -8,6 +8,7 @@ import {ALL, DATE} from "../api/strings";
 import {deleteExpenseAPI, getAllExpensesAPI} from "../api/apiURLs";
 import axios from "../api/axiosInstance";
 import ExpenseRow from "../components/ExpenseRow";
+import InformationPanel from "../components/InformationPanel";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -127,8 +128,8 @@ class Expenses extends React.Component{
 
   render(){
 
-    let items = [];
     const {activePage, expenses} = this.state;
+    let items = [];
     const end = (activePage*10) - 1;
     const start = end - 9;
     for (let i = start; i <= end; i++ ) {
@@ -183,7 +184,9 @@ class Expenses extends React.Component{
                 </Button>
               </Col>
             </Row>
-            <Row>
+
+            {expenses.length > 0 ?
+              <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
                 <Table responsive bordered hover>
                   <thead>
@@ -203,8 +206,19 @@ class Expenses extends React.Component{
                 </Table>
               </Col>
             </Row>
+              :
+              <Row>
+                <Col lg={12} md={12} xs={12} sm={12}>
+                    <InformationPanel
+                    panelTitle={"No expenses"}
+                    informationHeading={"You have no expenses"}
+                    message={"Please start using this system by adding a new expense."}
+                    />
+                </Col>
+              </Row>
+            }
 
-            {this.state.expenses.length > 0 &&
+            {expenses.length > 0 &&
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
 
