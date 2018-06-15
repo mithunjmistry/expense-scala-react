@@ -13,7 +13,8 @@ const BaseModal = (props) => (
 
     <Modal.Footer>
       <Button onClick={props.handleModalClose}>cancel</Button>
-      <Button bsStyle={props.buttonStyle} onClick={props.onConfirmAction}>{props.buttonText}</Button>
+      {props.buttonStyle &&
+      <Button bsStyle={props.buttonStyle} onClick={props.onConfirmAction}>{props.buttonText}</Button>}
     </Modal.Footer>
 </Modal>);
 

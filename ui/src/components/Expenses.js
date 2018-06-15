@@ -8,6 +8,10 @@ import {ALL, DATE} from "../api/strings";
 import {deleteExpenseAPI, getAllExpensesAPI} from "../api/apiURLs";
 import axios from "../api/axiosInstance";
 import ExpenseRow from "../components/ExpenseRow";
+import InformationPanel from "../components/InformationPanel";
+import ExpenseTable from "../components/ExpenseTable";
+import BaseModal from "./BaseModal";
+import Statistics from "../components/Statistics";
 
 const SelectGroup = ({options, label, ...props}) => (
   <FormGroup>
@@ -29,7 +33,9 @@ class Expenses extends React.Component{
       month: ALL,
       type: ALL,
       expenses: [],
-      totalItemsCount: 0
+      totalItemsCount: 0,
+      loading: true,
+      showModalState: false
   };
 
   getExpensesList = (sortBy, month, type) => {
@@ -50,11 +56,15 @@ class Expenses extends React.Component{
     }).then((response) => {
       this.setState(() => ({
         expenses: response.data,
-        totalItemsCount: response.data.length
+        totalItemsCount: response.data.length,
+        loading: false
       }));
     })
       .catch((error) => {
         console.log(error.response);
+        this.setState(() => ({
+          loading: false
+        }));
       });
   };
 
@@ -125,10 +135,18 @@ class Expenses extends React.Component{
     });
   };
 
+  handleModalClose = () => {
+    this.setState({ showModalState: false });
+  };
+
+  handleModalShow = () => {
+    this.setState({ showModalState: true });
+  };
+
   render(){
 
-    let items = [];
     const {activePage, expenses} = this.state;
+    let items = [];
     const end = (activePage*10) - 1;
     const start = end - 9;
     for (let i = start; i <= end; i++ ) {
@@ -176,6 +194,24 @@ class Expenses extends React.Component{
               </Row>
             </Form>
 
+            {expenses.length > 0 &&
+              <Row>
+              <Col lgHidden mdHidden xs={12} sm={12}>
+                <Button bsSize="small" bsStyle={"link"} className={"view-statistics-btn"} onClick={this.handleModalShow}>
+                  <Glyphicon glyph={"stats"}/> view statistics
+                </Button>
+              </Col>
+
+              <BaseModal
+                modalTitle={"Statistics"}
+                handleModalClose={this.handleModalClose}
+                showModalState={this.state.showModalState}
+              >
+                <Statistics/>
+              </BaseModal>
+            </Row>
+            }
+
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
                 <Button bsSize="small" bsStyle={"link"} className={"add-expense-btn"} onClick={() => this.changeRoute("/expense/add")}>
@@ -183,28 +219,22 @@ class Expenses extends React.Component{
                 </Button>
               </Col>
             </Row>
-            <Row>
-              <Col lg={12} md={12} xs={12} sm={12}>
-                <Table responsive bordered hover>
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>expense name</th>
-                    <th>expense type</th>
-                    <th>description</th>
-                    <th>date</th>
-                    <th>amount</th>
-                    <th>action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    {items}
-                  </tbody>
-                </Table>
-              </Col>
-            </Row>
 
-            {this.state.expenses.length > 0 &&
+            {(expenses.length > 0 || this.state.loading) ?
+              <ExpenseTable expenses={items}/>
+              :
+              <Row>
+                <Col lg={12} md={12} xs={12} sm={12}>
+                    <InformationPanel
+                    panelTitle={"No expenses"}
+                    informationHeading={"You have no expenses"}
+                    message={"Please start using this system by adding a new expense."}
+                    />
+                </Col>
+              </Row>
+            }
+
+            {expenses.length > 0 &&
             <Row>
               <Col lg={12} md={12} xs={12} sm={12}>
 
